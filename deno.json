@@ -3,5 +3,8 @@
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31"
   },
+  "tasks": {
+    "sound": "deno run --allow-net --allow-read --allow-write --allow-run src/sound/play.ts"
+  },
   "lock": false
 }
