@@ -1,10 +1,10 @@
 export {
-  has,
-  get,
-  set,
-  remove,
   clear,
-  size,
+  get,
+  has,
   keys,
+  remove,
+  set,
   setMaxSize,
+  size,
 } from "./mediaCache.ts";
