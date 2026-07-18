@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31"
+  },
+  "lock": false
+}

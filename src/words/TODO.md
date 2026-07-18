@@ -1,0 +1,2 @@
+- No difficulty penalty for danish letters
+- "Lydrette ord" should be easier.
