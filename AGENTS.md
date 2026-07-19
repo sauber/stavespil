@@ -4,7 +4,7 @@ A Danish spelling game for kids in grades 3–6.
 
 ## Documentation
 
-- [StaveSpil.md](StaveSpil.md) — Game rules, entities, domain reference
+- [README.md](README.md) — Game rules, entities, domain reference
 - [ARCHITECTURE.md](ARCHITECTURE.md) — Coding conventions, project structure,
   technical patterns
 
