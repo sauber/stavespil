@@ -8,7 +8,9 @@
   },
   "tasks": {
     "image": "deno run --allow-net --allow-read --allow-write src/image/show.ts",
-    "sound": "deno run --allow-net --allow-read --allow-write --allow-run src/sound/play.ts"
+    "sound": "deno run --allow-net --allow-read --allow-write --allow-run src/sound/play.ts",
+    "words": "deno run --allow-net src/words/generate.ts",
+    "play": "deno run --allow-net --allow-read play-cli.ts"
   },
   "lock": false
 }

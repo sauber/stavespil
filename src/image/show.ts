@@ -1,11 +1,8 @@
-import { get, has, remove } from "../cache/mod.ts";
-import { dataUrlToBytes, getWordPicture } from "./image.ts";
-import { blockify } from "@sauber/block-image";
-import { Image } from "@cross/image";
-import { getPixels } from "@unpic/pixels";
+import { has, remove } from "../cache/mod.ts";
+import { imageLoader } from "./mod.ts";
+import { printLine, showImage } from "../cli/mod.ts";
 
 const CACHE_PREFIX = "image:";
-const TARGET_LINES = 20;
 
 /**
  * Load PIXABAY_API_KEY from the project root .env file.
@@ -38,40 +35,19 @@ async function main(): Promise<void> {
   const cacheKey = `${CACHE_PREFIX}${word}`;
 
   const wasCached = has(cacheKey);
-  console.log(`Cache check for '${word}': ${wasCached ? "HIT" : "MISS"}`);
+  printLine(`Cache check for '${word}': ${wasCached ? "HIT" : "MISS"}`);
 
   if (!wasCached) {
-    console.log(`Fetching image for '${word}'...`);
-    await getWordPicture(apiKey, word);
-    console.log(`Stored '${word}' in cache`);
+    printLine(`Fetching image for '${word}'...`);
   }
 
-  const dataUrl = get(cacheKey);
-  if (!dataUrl) {
-    throw new Error(`Failed to read '${word}' from cache`);
-  }
-
-  const jpegBytes = dataUrlToBytes(dataUrl);
-  const { data, width, height } = await getPixels(jpegBytes);
-
-  const aspectRatio = width / height;
-  const targetWidth = Math.ceil(TARGET_LINES * aspectRatio) * 2;
-
-  const image = Image.fromRGBA(width, height, data);
-  image.resize({
-    width: targetWidth,
-    height: TARGET_LINES,
-    method: "nearest",
-    fit: "stretch",
-  });
-
-  const ansi = blockify(image.data, image.width, image.height);
-  console.log(ansi);
-  console.log(`Billeder fra Pixabay`);
+  const loader = imageLoader(apiKey);
+  await showImage(loader, word);
+  printLine("Billeder fra Pixabay");
 
   if (!wasCached) {
     remove(cacheKey);
-    console.log(`Cleaned up cache entry for '${word}'`);
+    printLine(`Cleaned up cache entry for '${word}'`);
   }
 }
 
