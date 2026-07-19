@@ -1,5 +1,5 @@
-/** Result of a completed level, used for trophy checking. */
-export type LevelResult = {
+/** Result of a completed round, used for trophy checking. */
+export type RoundResult = {
   /** Combined score (0–100) */
   score: number;
   /** Total errors across all words */
@@ -8,22 +8,22 @@ export type LevelResult = {
   timeScore: number;
   /** Total time in seconds */
   totalTime: number;
-  /** Level number played */
-  levelNumber: number;
-  /** Whether player leveled up */
-  isLevelUp: boolean;
-  /** Longest streak of consecutive correct words in this level */
+  /** Difficulty played */
+  difficulty: number;
+  /** Whether player ranked up */
+  isRankUp: boolean;
+  /** Longest streak of consecutive correct words in this round */
   maxStreak: number;
 };
 
 /** Cumulative player statistics for trophy checking. */
 export type PlayerStats = {
-  /** Total number of levels completed */
-  totalGames: number;
-  /** Distinct level numbers played */
-  levelsSeen: number[];
-  /** Current player level */
-  currentLevel: number;
+  /** Total number of rounds completed */
+  totalRounds: number;
+  /** Distinct difficulty numbers played */
+  distinctDifficulties: number[];
+  /** Current player rank */
+  currentRank: number;
 };
 
 /** A trophy that can be earned by the player. */
@@ -39,15 +39,17 @@ export type Trophy = {
 };
 
 /** Stored representation of an earned trophy. */
-type StoredTrophy = {
+export type StoredTrophy = {
   id: string;
   unlockedAt: number;
 };
 
-const STORAGE_KEY = "trophies";
-
 const TROPHY_DEFINITIONS: Array<Trophy & {
-  condition: (result: LevelResult, stats: PlayerStats, earned: string[]) => boolean;
+  condition: (
+    result: RoundResult,
+    stats: PlayerStats,
+    earned: string[],
+  ) => boolean;
 }> = [
   {
     id: "forste_bane",
@@ -89,21 +91,21 @@ const TROPHY_DEFINITIONS: Array<Trophy & {
     title: "Flittig",
     emoji: "📚",
     description: "Fuldfør 5 baner i alt",
-    condition: (_r, s) => s.totalGames >= 5,
+    condition: (_r, s) => s.totalRounds >= 5,
   },
   {
     id: "pa_vej_op",
     title: "På vej op",
     emoji: "📈",
     description: "Ryk op i niveau for første gang",
-    condition: (r) => r.isLevelUp,
+    condition: (r) => r.isRankUp,
   },
   {
     id: "bjergbestiger",
     title: "Bjergbestiger",
     emoji: "🏔️",
     description: "Nå niveau 10",
-    condition: (_r, s) => s.currentLevel >= 10,
+    condition: (_r, s) => s.currentRank >= 10,
   },
   {
     id: "ekspres",
@@ -117,54 +119,40 @@ const TROPHY_DEFINITIONS: Array<Trophy & {
     title: "Regnbue",
     emoji: "🌈",
     description: "Fuldfør baner på 5 forskellige niveauer",
-    condition: (_r, s) => s.levelsSeen.length >= 5,
+    condition: (_r, s) => s.distinctDifficulties.length >= 5,
   },
   {
     id: "natteravn",
     title: "Natteravn",
     emoji: "🦉",
     description: "Nå niveau 25",
-    condition: (_r, s) => s.currentLevel >= 25,
+    condition: (_r, s) => s.currentRank >= 25,
   },
   {
     id: "kongen_af_ord",
     title: "Kongen af ord",
     emoji: "👑",
     description: "Nå niveau 50",
-    condition: (_r, s) => s.currentLevel >= 50,
+    condition: (_r, s) => s.currentRank >= 50,
   },
 ];
-
-function loadEarned(): StoredTrophy[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as StoredTrophy[];
-  } catch {
-    return [];
-  }
-}
-
-function saveEarned(earned: StoredTrophy[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(earned));
-}
 
 /**
  * Check trophy conditions and return newly unlocked trophies.
  *
- * Reads existing trophies from localStorage, evaluates all conditions,
- * saves any newly earned trophies, and returns them.
+ * Evaluates all trophy conditions against the round result and player stats,
+ * returning only trophies not already in the earned list.
  *
- * @param result - The level result to check against
+ * @param result - The round result to check against
  * @param stats - Cumulative player statistics
+ * @param earnedIds - IDs of previously earned trophies
  * @returns Array of newly unlocked trophies (empty if none)
  */
 export function checkTrophies(
-  result: LevelResult,
+  result: RoundResult,
   stats: PlayerStats,
+  earnedIds: string[],
 ): Trophy[] {
-  const earned = loadEarned();
-  const earnedIds = earned.map((t) => t.id);
   const newlyUnlocked: Trophy[] = [];
 
   for (const def of TROPHY_DEFINITIONS) {
@@ -176,30 +164,8 @@ export function checkTrophies(
         emoji: def.emoji,
         description: def.description,
       });
-      earned.push({ id: def.id, unlockedAt: Date.now() });
     }
   }
 
-  if (newlyUnlocked.length > 0) {
-    saveEarned(earned);
-  }
-
   return newlyUnlocked;
-}
-
-/**
- * Get all earned trophies from storage.
- *
- * @returns Array of stored trophies with unlock timestamps
- */
-export function getEarnedTrophies(): StoredTrophy[] {
-  return loadEarned();
-}
-
-/**
- * Clear all earned trophies from storage.
- * Used for testing.
- */
-export function clearTrophies(): void {
-  localStorage.removeItem(STORAGE_KEY);
 }

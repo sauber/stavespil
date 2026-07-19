@@ -1,5 +1,5 @@
 import { assertEquals, assert } from "@std/assert";
-import { getWordSound } from "./getWordSound.ts";
+import { getWordSound } from "./sound.ts";
 import { has, get as cacheGet, clear } from "../cache/mod.ts";
 
 const API_KEY = "6ab21f277d9e4e2ea3ebf8006e332f9e";

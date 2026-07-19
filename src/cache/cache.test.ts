@@ -1,5 +1,5 @@
 import { assertEquals, assert } from "@std/assert";
-import { has, get, set, remove, clear, size, keys, setMaxSize } from "./mediaCache.ts";
+import { has, get, set, remove, clear, size, keys, setMaxSize } from "./cache.ts";
 
 Deno.test("has() returns false for empty cache", () => {
   clear();

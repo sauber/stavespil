@@ -7,4 +7,4 @@ export {
   set,
   setMaxSize,
   size,
-} from "./mediaCache.ts";
+} from "./cache.ts";

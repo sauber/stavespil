@@ -38,7 +38,7 @@ export async function extract(file: Uint8Array): Promise<WordList> {
 }
 
 /** Pick most frequent words having 2 letters or more */
-export function topNwords(source: WordList, count: number): WordList {
+export function limitWords(source: WordList, count: number): WordList {
   return source
     .filter((w) => w.word.length >= 2)
     .sort((a, b) => b.score - a.score)
@@ -172,7 +172,7 @@ if (import.meta.main) {
   console.log("Generating word list");
   const zip: Uint8Array = await download();
   const source: WordList = await extract(zip);
-  const picked: WordList = topNwords(source, 2000);
+  const picked: WordList = limitWords(source, 2000);
   const scored: WordList = scoreWords(picked);
   const groups: WordGroups = wordGroups(scored);
   await storeWords(groups);

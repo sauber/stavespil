@@ -1,5 +1,5 @@
 import { assertEquals, assert } from "@std/assert";
-import { getWordPicture } from "./getWordPicture.ts";
+import { getWordPicture } from "./picture.ts";
 import { has, get as cacheGet, clear } from "../cache/mod.ts";
 
 const API_KEY = "56754611-2f3676f593072d805db4f2c97";

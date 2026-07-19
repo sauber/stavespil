@@ -1,1 +1,1 @@
-export { getWordPicture, dataUrlToBytes } from "./getWordPicture.ts";
+export { getWordPicture, dataUrlToBytes } from "./picture.ts";

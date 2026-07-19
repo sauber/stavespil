@@ -6,8 +6,8 @@
 
 - Show inline feedback bubbles during gameplay after each letter input.
 - React to correct and incorrect letter inputs.
-- Track consecutive correct words (streak) within a level.
-- Reset error count per word; reset streak per level.
+- Track consecutive correct words (streak) within a round.
+- Reset error count per word; reset streak per round.
 - Return a message object or null (no rendering logic in this module).
 - Messages are in Danish with emojis.
 
@@ -34,8 +34,7 @@
 
 - 12 persistent achievements.
 - Each trophy earned only once (first time condition is met).
-- Stored in localStorage.
-- Checked after each level completion.
+- Checked after each round completion.
 - Return newly unlocked trophies (empty array if none).
 - Celebration screen with confetti when a trophy is unlocked (3 seconds).
 - Trophy collection displayed on menu screen as a grid of cards.
@@ -44,18 +43,18 @@
 
 | Emoji | ID | Condition |
 |-------|----|-----------|
-| 🌟 | `Første bane` | Complete your first level |
-| 🏆 | `Stavemester` | Score ≥ 90 on a level |
-| 🚀 | `Lynhurtig` | Complete a level with time score ≥ 90 |
-| ✨ | `Fejlfri` | Complete a level with 0 errors |
-| 🔥 | `På række` | Spell 10 words in a row without errors (within one level) |
-| 📚 | `Flittig` | Complete 5 levels total |
-| 📈 | `På vej op` | Level up for the first time |
-| 🏔️ | `Bjergbestiger` | Reach level 10 |
-| ⚡ | `Ekspres` | Complete a level in under 3 minutes |
-| 🌈 | `Regnbue` | Complete levels on 5 different level numbers |
-| 🦉 | `Natteravn` | Reach level 25 |
-| 👑 | `Kongen af ord` | Reach level 50 |
+| 🌟 | `forste_bane` | Complete your first round |
+| 🏆 | `stavemester` | Score ≥ 90 on a round |
+| 🚀 | `lynhurtig` | Complete a round with time score ≥ 90 |
+| ✨ | `fejlfri` | Complete a round with 0 errors |
+| 🔥 | `pa_rekke` | Spell 10 words in a row without errors (within one round) |
+| 📚 | `flittig` | Complete 5 rounds total |
+| 📈 | `pa_vej_op` | Rank up for the first time |
+| 🏔️ | `bjergbestiger` | Reach rank 10 |
+| ⚡ | `ekspres` | Complete a round in under 3 minutes |
+| 🌈 | `regnbue` | Complete rounds on 5 different difficulties |
+| 🦉 | `natteravn` | Reach rank 25 |
+| 👑 | `kongen_af_ord` | Reach rank 50 |
 
 #### Trophy Display
 
@@ -94,13 +93,13 @@ type Cheer = {
 
 - **Function**: `onLetterInput(input: CheerInput): Cheer | null`
 - Returns `null` when no message should be shown (e.g., correct letter mid-word).
-- Internal state: `streakCount` (resets per level via `resetLevel()`), `wordErrorCount` (resets per word automatically).
+- Internal state: `streakCount` (resets per round via `resetLevel()`), `wordErrorCount` (resets per word automatically).
 - Messages are hardcoded as constants in the module.
 
 ### Trophy Interface
 
 ```typescript
-type LevelResult = {
+type RoundResult = {
   /** Combined score (0–100) */
   score: number;
   /** Total errors across all words */
@@ -109,21 +108,21 @@ type LevelResult = {
   timeScore: number;
   /** Total time in seconds */
   totalTime: number;
-  /** Level number played */
-  levelNumber: number;
-  /** Whether player leveled up */
-  isLevelUp: boolean;
-  /** Longest streak of consecutive correct words in this level */
+  /** Difficulty played */
+  difficulty: number;
+  /** Whether player ranked up */
+  isRankUp: boolean;
+  /** Longest streak of consecutive correct words in this round */
   maxStreak: number;
 };
 
 type PlayerStats = {
-  /** Total number of levels completed */
-  totalGames: number;
-  /** Set of distinct level numbers played */
-  levelsSeen: number[];
-  /** Current player level */
-  currentLevel: number;
+  /** Total number of rounds completed */
+  totalRounds: number;
+  /** Distinct difficulty numbers played */
+  distinctDifficulties: number[];
+  /** Current player rank */
+  currentRank: number;
 };
 
 type Trophy = {
@@ -138,12 +137,7 @@ type Trophy = {
 };
 ```
 
-- **Function**: `checkTrophies(levelResult: LevelResult, playerStats: PlayerStats): Trophy[]`
-- Reads existing trophies from localStorage, checks conditions, saves new ones, returns only newly unlocked.
+- **Function**: `checkTrophies(result: RoundResult, stats: PlayerStats, earnedIds: string[]): Trophy[]`
+- Evaluates all trophy conditions, returns only newly unlocked trophies.
 - Trophy definitions stored as a hardcoded array of `{ id, title, emoji, description, condition }`.
-
-### Storage
-
-- **Key**: `trophies`
-- **Format**: `Array<{ id: string, unlockedAt: number }>`
-- **Library**: `localStorage` (web standard)
+- No localStorage access — player module handles storage.

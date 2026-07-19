@@ -1,33 +1,33 @@
 import { assertEquals, assert } from "@std/assert";
 import { BlobWriter, TextReader, ZipWriter } from "@zip-js/zip-js";
-import { topNwords, wordGroups, scoreWords, extract, download, existsWords, storeWords, retrieveWords } from "./generate.ts";
+import { limitWords, wordGroups, scoreWords, extract, download, existsWords, storeWords, retrieveWords } from "./generate.ts";
 
-Deno.test("topNwords filters words with less than 2 characters", () => {
+Deno.test("limitWords filters words with less than 2 characters", () => {
   const source = [
     { type: "NC", word: "a", score: 0.1 },
     { type: "NC", word: "kat", score: 0.2 },
     { type: "NC", word: "b", score: 0.3 },
   ];
-  const result = topNwords(source, 10);
+  const result = limitWords(source, 10);
   assertEquals(result.length, 1);
   assertEquals(result[0].word, "kat");
 });
 
-Deno.test("topNwords picks most frequent words by score descending", () => {
+Deno.test("limitWords picks most frequent words by score descending", () => {
   const source = [
     { type: "NC", word: "hus", score: 0.1 },
     { type: "NC", word: "bil", score: 0.5 },
     { type: "NC", word: "kat", score: 0.3 },
     { type: "NC", word: "dog", score: 0.9 },
   ];
-  const result = topNwords(source, 3);
+  const result = limitWords(source, 3);
   assertEquals(result.length, 3);
   assertEquals(result[0].word, "dog");
   assertEquals(result[1].word, "bil");
   assertEquals(result[2].word, "kat");
 });
 
-Deno.test("topNwords returns at most count words", () => {
+Deno.test("limitWords returns at most count words", () => {
   const source = [
     { type: "NC", word: "ab", score: 0.1 },
     { type: "NC", word: "cd", score: 0.2 },
@@ -35,18 +35,18 @@ Deno.test("topNwords returns at most count words", () => {
     { type: "NC", word: "gh", score: 0.4 },
     { type: "NC", word: "ij", score: 0.5 },
   ];
-  const result = topNwords(source, 2);
+  const result = limitWords(source, 2);
   assertEquals(result.length, 2);
   assertEquals(result[0].word, "ij");
   assertEquals(result[1].word, "gh");
 });
 
-Deno.test("topNwords returns empty array when no words have 2+ chars", () => {
+Deno.test("limitWords returns empty array when no words have 2+ chars", () => {
   const source = [
     { type: "NC", word: "a", score: 0.1 },
     { type: "NC", word: "b", score: 0.2 },
   ];
-  const result = topNwords(source, 10);
+  const result = limitWords(source, 10);
   assertEquals(result.length, 0);
 });
 

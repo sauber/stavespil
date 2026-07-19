@@ -23,9 +23,9 @@ PRÆSTATIONSSCORE (0–100):
 FEJLRATE: Totale fejl / 20 ord. 0 fejl/ord = 100p, 1 = 80p, 2 = 60p, 3 = 40p, ≥4
 = 20p. Lineær interpolation.
 
-TIDSSCORE: Forventet tid/ord = 5s × (sværhedsværdi 1.0–3.0). Faktisk tid fra 1.
-bogstav til korrekt stavning. Tidsscore/ord = min(150, forventet/faktisk × 100).
-Gennemsnit over 20 ord.
+TIDSSCORE: Forventet tid/bogstav = 2s × (sværhedsværdi 1.0–3.0). Faktisk tid
+fra 1. bogstav til korrekt stavning. Tidsscore/ord = min(150, forventet/faktisk
+× 100). Gennemsnit over 20 ord.
 
 SAMLET = (fejlrate × 0.6) + (tidsscore × 0.4).
 
@@ -34,20 +34,12 @@ NIVEÆNDRING: Score ≥75 → +1. Score 40–74 → uændret. Score <40 → −1
 
 ## Spiller niveau
 
-- Når alle ord er stavet, så er banen færdig, og spillerens niveau udregnes og
-  tilføjes til spillerens historik.
-- Niveauet er baseret på
-  - Sværhedsgraden af ordene
-  - Antal stavningsfejl
-  - Gennemførelsestid af banen
-- Det udregnede niveau kan være samme som niveauet da banen begyndte, eller 1
-  højere eller 1 lavere.
-- Spillerens niveau skal relatere til banens niveau. For eksempel, hvis
-  spilleres niveau er 10 når banen starter, og bane niveau 10 vælges, og
-  spilleres klares sig ca. gennemsnitlig med stavning, så forbliver spilleres på
-  niveau 10.
-- Seneste niveau og historik med niveau gemmes i localStorage.
-- Allerførste gang spillet startes, så er spillerens antagede niveau det samme
-  niveau for den valgte bane.
-- Der skal ikke være login. Der er kun 1 bruger profil, som gemmes i
-  localStorage.
+- Når alle ord er stavet, så er banen færdig
+
+Når en spiller er færdig med banen, så returneres en samlet bedømmelse:
+
+- -1 = Gennemført værre end forventet og lavere niveau anbefales
+- 0 = Godkendt men mere træning på samme niveau anbefales
+- +1 = Bedre end forventet og højere niveau anbefales
+
+Udregning af score for banen er uafhængig af niveau eller historik for spiller.
