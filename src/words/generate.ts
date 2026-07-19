@@ -151,18 +151,18 @@ export function wordGroups(source: WordList): WordGroups {
 }
 
 // Confirm words are stored in cache
-export function existsWords(): boolean {
-  return localStorage.getItem("wordList") !== null;
+export function existsWords(key = "wordList"): boolean {
+  return localStorage.getItem(key) !== null;
 }
 
 // Store words in cache
-export function storeWords(groups: WordGroups): void {
-  localStorage.setItem("wordList", JSON.stringify(groups));
+export function storeWords(groups: WordGroups, key = "wordList"): void {
+  localStorage.setItem(key, JSON.stringify(groups));
 }
 
 // Load words from cache
-export function retrieveWords(): WordGroups {
-  const data = localStorage.getItem("wordList");
+export function retrieveWords(key = "wordList"): WordGroups {
+  const data = localStorage.getItem(key);
   if (data === null) return [];
   return JSON.parse(data);
 }

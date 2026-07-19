@@ -54,9 +54,14 @@ export function selectWords(groups: WordList[], difficulty: number): string[] {
   const belowIndex = Math.max(0, levelIndex - 1);
   const aboveIndex = Math.min(groups.length - 1, levelIndex + 1);
 
+  const used = new Set<string>();
+
   const pick = (group: WordList, count: number): string[] => {
-    const shuffled = [...group].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count).map((entry) => entry.word);
+    const available = group.filter((e) => !used.has(e.word));
+    const shuffled = [...available].sort(() => Math.random() - 0.5);
+    const picked = shuffled.slice(0, count).map((entry) => entry.word);
+    for (const word of picked) used.add(word);
+    return picked;
   };
 
   const words: string[] = [

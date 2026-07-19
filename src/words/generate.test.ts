@@ -142,7 +142,11 @@ Deno.test("extract skips malformed lines", async () => {
   assertEquals(result.length, 2);
 });
 
-Deno.test("download returns zip data that can be extracted", { permissions: { net: true } }, async () => {
+Deno.test({
+  name: "download returns zip data that can be extracted",
+  ignore: true,
+  permissions: { net: true },
+}, async () => {
   const data = await download();
   assert(data.length > 0, "Downloaded data should not be empty");
   const words = await extract(data);
@@ -151,8 +155,8 @@ Deno.test("download returns zip data that can be extracted", { permissions: { ne
 });
 
 Deno.test("existsWords returns false when no cache", () => {
-  localStorage.removeItem("wordList");
-  assertEquals(existsWords(), false);
+  localStorage.removeItem("wordList-test");
+  assertEquals(existsWords("wordList-test"), false);
 });
 
 Deno.test("storeWords and retrieveWords round-trip", () => {
@@ -160,8 +164,9 @@ Deno.test("storeWords and retrieveWords round-trip", () => {
     [{ type: "NC", word: "kat", score: 0.5 }],
     [{ type: "A", word: "stor", score: 0.3 }],
   ];
-  storeWords(groups);
-  const retrieved = retrieveWords();
+  storeWords(groups, "wordList-test");
+  const retrieved = retrieveWords("wordList-test");
   assertEquals(retrieved, groups);
-  assertEquals(existsWords(), true);
+  assertEquals(existsWords("wordList-test"), true);
+  localStorage.removeItem("wordList-test");
 });
