@@ -1,9 +1,6 @@
 import { assertEquals } from "@std/assert";
-import {
-  checkTrophies,
-  type RoundResult,
-  type PlayerStats,
-} from "./trophy.ts";
+import { checkTrophies } from "./trophy.ts";
+import type { PlayerStats, RoundResult } from "../gameState/mod.ts";
 
 function makeResult(overrides: Partial<RoundResult> = {}): RoundResult {
   return {

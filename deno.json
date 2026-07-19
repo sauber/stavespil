@@ -7,7 +7,7 @@
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31"
   },
   "tasks": {
-    "image": "deno run --allow-net --allow-read --allow-write src/picture/show.ts",
+    "image": "deno run --allow-net --allow-read --allow-write src/image/show.ts",
     "sound": "deno run --allow-net --allow-read --allow-write --allow-run src/sound/play.ts"
   },
   "lock": false

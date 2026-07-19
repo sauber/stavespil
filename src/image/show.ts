@@ -1,5 +1,5 @@
 import { get, has, remove } from "../cache/mod.ts";
-import { dataUrlToBytes, getWordPicture } from "./picture.ts";
+import { dataUrlToBytes, getWordPicture } from "./image.ts";
 import { blockify } from "@sauber/block-image";
 import { Image } from "@cross/image";
 import { getPixels } from "@unpic/pixels";

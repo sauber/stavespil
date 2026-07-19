@@ -1,34 +1,6 @@
-/** Input for the cheer function on each letter keypress. */
-export type CheerInput = {
-  /** The word being spelled */
-  word: string;
-  /** Index of the letter just entered (0-based) */
-  letterIndex: number;
-  /** Whether the entered letter was correct */
-  isCorrect: boolean;
-  /** Number of wrong letters entered for this word so far */
-  errorCount: number;
-  /** Whether the word was just completed correctly */
-  isWordComplete: boolean;
-};
+import type { Cheer, CheerInput } from "../gameState/mod.ts";
 
-/** A cheer message to display to the player. */
-export type Cheer = {
-  /** Danish message text */
-  text: string;
-  /** Emoji to display */
-  emoji: string;
-  /** Visual style variant */
-  style:
-    | "neutral"
-    | "helpful"
-    | "encouraging"
-    | "reference"
-    | "celebrated"
-    | "milestone";
-  /** Display duration in milliseconds */
-  duration: number;
-};
+export type { Cheer, CheerInput };
 
 const WRONG_MESSAGES: Array<{
   text: string;

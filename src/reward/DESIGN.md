@@ -98,33 +98,10 @@ type Cheer = {
 
 ### Trophy Interface
 
+`RoundResult` and `PlayerStats` are defined in `src/spell/types.ts` and imported
+by this module.
+
 ```typescript
-type RoundResult = {
-  /** Combined score (0–100) */
-  score: number;
-  /** Total errors across all words */
-  errors: number;
-  /** Time score (0–100) */
-  timeScore: number;
-  /** Total time in seconds */
-  totalTime: number;
-  /** Difficulty played */
-  difficulty: number;
-  /** Whether player ranked up */
-  isRankUp: boolean;
-  /** Longest streak of consecutive correct words in this round */
-  maxStreak: number;
-};
-
-type PlayerStats = {
-  /** Total number of rounds completed */
-  totalRounds: number;
-  /** Distinct difficulty numbers played */
-  distinctDifficulties: number[];
-  /** Current player rank */
-  currentRank: number;
-};
-
 type Trophy = {
   /** Unique identifier */
   id: string;

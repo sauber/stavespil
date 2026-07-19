@@ -1,50 +1,88 @@
-Tech stack: Deno, Hono, Tailwind CSS, recharts (niveaugraf), framer-motion
-(animationer), canvas-confetti (trofæ-fejring).
+# Web Module
 
-Design Preferences
+Browser-based frontend for StaveSpil.
 
-Minimalistisk børnevenlig stil — rent layout, rolige pasteller (lys blå #B8DEFF,
-lysegrøn #B8F0C8, varm hvid #FAFAF7, blødrosa accenter #FFD6E0), store runde
-former, tydelig Sans-serif skrift (stor skriftstørrelse). Tastatur: grid af
-runde knapper, inaktive bogstaver dæmpede (lav opacity). Bogstavrammer: store
-firkantede/runde felter med tydelig border. Animationer: subtile og rolige —
-bogstav 'falder på plads' ved korrekt input, fejl giver en lille rysten.
-Trofæer: farverige emoji-ikoner med titel. Ingen mørk baggrund. Responsivt —
-primært tablet, men fungerer på desktop.
+## Purpose
 
-SPILFLOW: Ét ord ad gangen præsenteres. Billede vises, lyd afspilles automatisk
-og kan genafspilles. Tomme bogstavrammer (antal = ordets længde) vises.
-Spilleren trykker bogstaver på on-screen tastatur (dansk alfabet inkl. æ, ø, å).
-Korrekte bogstaver udfylder rammer i rækkefølge med animation. Ved forkert
-bogstav halveres aktive bogstaver. Efter 4 fejl er kun ordets bogstaver aktive.
-Ordet vises aldrig som tekst. Næste ord starter automatisk ved korrekt stavning.
+Render the game UI in the browser. This module is the only one that touches the
+DOM. It receives state from the spell engine and translates it into visual
+output.
 
-MENUSKÆRM: Spilleren ser sit nuværende niveau og en linjegraf med niveauhistorik
-(recharts). Alle 100 niveauer vises i en scrollbar liste med et eksempelord fra
-hvert. Spilleren vælger niveau og starter banen. Spillerens trofæsamling vises
-nederst på menuskærmen som et gitter af trofækort (emoji + titel + dato). Låste
-trofæer vises gråtonede med et låseikon.
+## Tech Stack
 
-## Præsentation
+| Tool | Purpose |
+|------|---------|
+| Deno | Runtime |
+| Hono | HTTP server and routing |
+| Tailwind CSS | Utility-first styling |
+| recharts | Rank history line chart |
+| framer-motion | UI animations |
+| canvas-confetti | Trophy unlock celebration |
 
-- Det ord som skal staves udvælges af spillet, men vises ikke.
-- Lydfilen afspilles for ordet. Spilleren kan genafspille lydfilen.
-- Billedet for ordet vises.
-- Der vises et antal tommer rammer svarende til antallet af bogstaver i order.
-- Efterhånden som ordet staves udfyldes rammerne med bogstaver.
-- Der vises et tastatur med bogstaver. Fra starten er alle bogstaver aktive.
-- Hver gang der staves et bogstav forkert, så bliver halvdelen af de aktive
-  bogstaver, og som ikke skal bruges i ordet, gjort inaktive.
-- Efter 4 fejl er kun bogstaver som indgår i ordet aktive, og disse kan ikke
-  gøres inaktive.
+## Visual Design
 
-## Input
+Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 
-- På en bane trykker spilleren bogstaver på tastaturet.
-- Spillet reagerer på hvert tryk.
+- **Colors**: Light blue `#B8DEFF`, light green `#B8F0C8`, warm white `#FAFAF7`,
+  soft pink accents `#FFD6E0`. No dark backgrounds.
+- **Typography**: Clear sans-serif, large font sizes.
+- **Shapes**: Large, rounded forms throughout.
+- **Layout**: Responsive — primarily tablet, but functional on desktop.
 
-## Design
+## Game Screen
 
-- Aldersgruppen for spillet er børn i 3. til 6. klassetrin.
-- Der skal være opmuntrende og motiverende beskeder når stavning går dårligt.
-- Der skal tildeles sjove trofæer når stavning går godt.
+### Word Presentation
+
+- The word to spell is chosen by the game but **never displayed as text**.
+- An image representing the word is shown.
+- A sound clip plays automatically on word load. The player can replay it.
+- Empty letter frames appear (count equals word length).
+
+### Keyboard
+
+- Grid of round buttons representing the Danish alphabet (a–z plus æ, ø, å).
+- All letters start active.
+- On each wrong letter, half of the active letters that are **not** in the word
+  are dimmed (set to low opacity).
+- After 4 errors, only letters that appear in the word remain active. These
+  cannot be dimmed further.
+- Inactive letters are visually muted (reduced opacity).
+
+### Letter Frames
+
+- Large square or rounded-square fields with clear borders.
+- Correct letters fill frames in sequence with a "fall into place" animation.
+- Wrong letters trigger a subtle shake animation.
+
+### Flow
+
+1. One word is presented at a time.
+2. Player taps letters on the on-screen keyboard.
+3. Correct letters fill the next frame in order.
+4. After all frames are filled correctly, the next word loads automatically.
+
+## Menu Screen
+
+### Rank Display
+
+- Current (most recent) rank shown prominently.
+- Line chart of rank history over time (recharts).
+
+### Level Selection
+
+- Scrollable list of all 100 difficulty levels.
+- Each level shows an example word.
+- Player taps a level to start the round.
+
+### Trophy Collection
+
+- Grid of trophy cards displayed below the level list.
+- Unlocked trophies: full color emoji + title + date earned.
+- Locked trophies: grayscale with a lock icon, hidden title.
+
+## Game Rules
+
+- Target audience: kids in grades 3–6.
+- Encouraging and motivating messages when spelling goes poorly (cheers from the
+  reward module).
+- Fun trophies awarded when spelling goes well (trophies from the reward module).

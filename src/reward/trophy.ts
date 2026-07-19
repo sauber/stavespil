@@ -1,30 +1,4 @@
-/** Result of a completed round, used for trophy checking. */
-export type RoundResult = {
-  /** Combined score (0–100) */
-  score: number;
-  /** Total errors across all words */
-  errors: number;
-  /** Time score (0–100) */
-  timeScore: number;
-  /** Total time in seconds */
-  totalTime: number;
-  /** Difficulty played */
-  difficulty: number;
-  /** Whether player ranked up */
-  isRankUp: boolean;
-  /** Longest streak of consecutive correct words in this round */
-  maxStreak: number;
-};
-
-/** Cumulative player statistics for trophy checking. */
-export type PlayerStats = {
-  /** Total number of rounds completed */
-  totalRounds: number;
-  /** Distinct difficulty numbers played */
-  distinctDifficulties: number[];
-  /** Current player rank */
-  currentRank: number;
-};
+import type { PlayerStats, RoundResult } from "../gameState/mod.ts";
 
 /** A trophy that can be earned by the player. */
 export type Trophy = {

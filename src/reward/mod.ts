@@ -7,8 +7,6 @@ export {
 
 export {
   checkTrophies,
-  type RoundResult,
-  type PlayerStats,
   type Trophy,
   type StoredTrophy,
 } from "./trophy.ts";

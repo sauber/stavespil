@@ -75,13 +75,9 @@ type RoundHistoryEntry = {
 type PlayerProfile = {
   roundHistory: RoundHistoryEntry[];
 };
-
-type PlayerStats = {
-  totalRounds: number;
-  distinctDifficulties: number[];
-  currentRank: number;
-};
 ```
+
+`PlayerStats` is defined in `src/spell/types.ts` and imported by this module.
 
 ### Functions
 
