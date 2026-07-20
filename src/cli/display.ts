@@ -143,13 +143,9 @@ async function decodeImage(data: Uint8Array): Promise<Image> {
   return await Image.decode(data);
 }
 
-/** Fetch image for word, blockify, and print to terminal. */
-export async function showImage(
-  loader: MediaLoader,
-  word: string,
-): Promise<void> {
-  const imageBytes = await loader(word);
-  const image = await decodeImage(imageBytes);
+/** Decode image bytes, resize, and print as block art to terminal. */
+export async function showImageBytes(data: Uint8Array): Promise<void> {
+  const image = await decodeImage(data);
   const aspectRatio = image.width / image.height;
   const targetWidth = Math.ceil(TARGET_LINES * aspectRatio) * 2;
   image.resize({
@@ -160,6 +156,15 @@ export async function showImage(
   });
   const ansi = blockify(image.data, image.width, image.height);
   console.log(ansi);
+}
+
+/** Fetch image for word, blockify, and print to terminal. */
+export async function showImage(
+  loader: MediaLoader,
+  word: string,
+): Promise<void> {
+  const imageBytes = await loader(word);
+  await showImageBytes(imageBytes);
 }
 
 /** Print a line of text to stdout. */

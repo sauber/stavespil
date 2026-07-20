@@ -1,23 +1,16 @@
-import { ensureWords, retrieveWords } from "./src/words/mod.ts";
-import { loadProfile } from "./src/player/mod.ts";
-import {
-  selectWords,
-  computeScore,
-  calculateMaxStreak,
-  calculateRankChange,
-} from "./src/spell/mod.ts";
-import type { WordResult } from "./src/spell/mod.ts";
+import { ensureWords } from "./src/words/mod.ts";
+import { calculateNewRank, loadProfile, saveProfile } from "./src/player/mod.ts";
+import { createRound } from "./src/spell/mod.ts";
+import type { EngineState, MediaLoader } from "./src/spell/mod.ts";
 import { imageLoader } from "./src/image/mod.ts";
 import {
   flashWrong,
-  initSlots,
-  onInterrupt,
   printLine,
-  readKey,
   renderSlots,
   setRawMode,
-  showImage,
+  showImageBytes,
 } from "./src/cli/mod.ts";
+import { onInterrupt, readKey } from "./src/cli/mod.ts";
 
 async function loadApiKey(): Promise<string> {
   const text = await Deno.readTextFile(".env");
@@ -27,18 +20,56 @@ async function loadApiKey(): Promise<string> {
 }
 
 await ensureWords();
-const groups = retrieveWords();
 const profile = loadProfile();
 const lastEntry = profile.roundHistory.at(-1);
-const difficulty = lastEntry?.difficulty ?? 1;
-const words = selectWords(groups, difficulty);
+const difficulty = lastEntry?.newRank ?? 1;
 
-printLine(`Level ${difficulty}`);
+for (const entry of profile.roundHistory.slice(-5)) {
+  const sym = entry.result === 1 ? "↑" : entry.result === -1 ? "↓" : "→";
+  printLine(
+    `Level ${entry.difficulty}, Rank ${sym}, Errors ${entry.errors}, Time ${entry.totalTime}s`,
+  );
+}
 
 const apiKey = await loadApiKey();
-const loader = imageLoader(apiKey, true);
+const imageLoaderFn = imageLoader(apiKey, true);
+const noopSoundLoader: MediaLoader = () => Promise.resolve(new Uint8Array(0));
 
-const wordResults: WordResult[] = [];
+let displayedWordIndex = -1;
+let latestState!: EngineState;
+let newWordPending = false;
+let pendingAdvance = false;
+
+const round = await createRound({
+  difficulty,
+  imageLoader: imageLoaderFn,
+  soundLoader: noopSoundLoader,
+  onStateChange: (state: EngineState) => {
+    latestState = state;
+
+    if (state.wordIndex !== displayedWordIndex) {
+      newWordPending = true;
+    }
+
+    if (!newWordPending && displayedWordIndex >= 0) {
+      const slots = state.frames.map((f) => f ?? "_");
+      renderSlots(slots);
+    }
+
+    if (state.cheer) {
+      printLine("");
+      printLine(`${state.cheer.emoji} ${state.cheer.text}`);
+    }
+
+    if (state.isWordComplete && !state.isComplete) {
+      pendingAdvance = true;
+    }
+  },
+});
+
+const words = round.getWords();
+
+printLine(`Level ${difficulty}`);
 
 setRawMode(true);
 
@@ -48,57 +79,70 @@ try {
     Deno.exit(1);
   });
 
-  for (const [i, word] of words.entries()) {
-    const expected = [...word];
-
-    printLine("");
-    printLine(`Level ${difficulty} Word #${i + 1} of ${words.length}: ${word}`);
-    await showImage(loader, word);
-
-    const startTime = Date.now();
-    const slots = initSlots(word.length);
-    let pos = 0;
-    let errors = 0;
-    renderSlots(slots);
-
-    while (pos < expected.length) {
-      const ch = await readKey();
-
-      if (ch === "\x03") {
-        setRawMode(false);
-        Deno.exit(1);
-      }
-
-      if (ch === expected[pos]) {
-        slots[pos] = ch;
-        renderSlots(slots);
-        pos++;
-      } else {
-        errors++;
-        await flashWrong(slots, pos, ch);
-      }
+  while (!round.isComplete()) {
+    if (newWordPending) {
+      newWordPending = false;
+      displayedWordIndex = latestState.wordIndex;
+      printLine("");
+      printLine(
+        `Level ${difficulty} Word #${displayedWordIndex + 1} of ${latestState.totalWords}: ${words[displayedWordIndex]}`,
+      );
+      await showImageBytes(latestState.image);
+      const slots = latestState.frames.map((f) => f ?? "_");
+      renderSlots(slots);
     }
 
-    const endTime = Date.now();
-    wordResults.push({ word, errors, startTime, endTime });
+    if (pendingAdvance) {
+      pendingAdvance = false;
+      round.nextWord();
+      continue;
+    }
+
+    const ch = await readKey();
+
+    if (ch === "\x03") {
+      setRawMode(false);
+      Deno.exit(1);
+    }
+
+    const currentWord = words[latestState.wordIndex];
+    const nextPos = latestState.frames.filter((f) => f !== null).length;
+    if (ch.toLowerCase() !== currentWord[nextPos].toLowerCase()) {
+      const tempSlots = latestState.frames.map((f) => f ?? "_");
+      await flashWrong(tempSlots, nextPos, ch);
+    }
+
+    round.enterLetter(ch);
   }
 } finally {
   setRawMode(false);
 }
 
-const scoreResult = computeScore(wordResults, difficulty);
-const maxStreak = calculateMaxStreak(wordResults);
-const rankChange = calculateRankChange(scoreResult.combinedScore);
-const rankSymbol = rankChange === 1 ? "↑" : rankChange === -1 ? "↓" : "→";
+const result = round.getResult();
+const rankSymbol =
+  result.rankChange === 1 ? "↑" : result.rankChange === -1 ? "↓" : "→";
 
 printLine("");
 printLine("--- Result ---");
-printLine(`Score:    ${scoreResult.combinedScore}`);
-printLine(`Errors:   ${wordResults.reduce((s, r) => s + r.errors, 0)}`);
-printLine(`Time:     ${scoreResult.totalTime}s`);
+printLine(`Score:    ${result.score}`);
+printLine(`Errors:   ${result.errors}`);
+printLine(`Time:     ${result.totalTime}s`);
 printLine(`Rank:     ${rankSymbol}`);
-printLine(`Streak:   ${maxStreak}`);
+printLine(`Streak:   ${result.maxStreak}`);
 
-// --- Attribution ---
+const currentRank = lastEntry?.newRank ?? 1;
+const newRank = calculateNewRank(currentRank, difficulty, result.rankChange);
+
+profile.roundHistory.push({
+  difficulty,
+  result: result.rankChange,
+  newRank,
+  errors: result.errors,
+  totalTime: result.totalTime,
+  trophiesUnlocked: [],
+  timestamp: Date.now(),
+});
+saveProfile(profile);
+
 printLine("");
 printLine("Billeder fra Pixabay (pixabay.com)");

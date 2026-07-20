@@ -44,6 +44,8 @@ export type RoundResult = {
   difficulty: number;
   /** Whether player ranked up */
   isRankUp: boolean;
+  /** Rank change: +1 (up), 0 (unchanged), −1 (down) */
+  rankChange: -1 | 0 | 1;
   /** Longest streak of consecutive correct words in this round */
   maxStreak: number;
 };

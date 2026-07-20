@@ -10,6 +10,7 @@ function makeResult(overrides: Partial<RoundResult> = {}): RoundResult {
     totalTime: 200,
     difficulty: 5,
     isRankUp: false,
+    rankChange: 0,
     maxStreak: 0,
     ...overrides,
   };

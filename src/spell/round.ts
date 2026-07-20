@@ -153,6 +153,7 @@ export async function createRound(config: RoundConfig): Promise<Round> {
       totalTime: scoreResult.totalTime,
       difficulty: config.difficulty,
       isRankUp: scoreResult.rankChange === 1,
+      rankChange: scoreResult.rankChange,
       maxStreak,
     };
   }

@@ -170,6 +170,7 @@ Deno.test("round.getResult returns valid RoundResult", async () => {
   assertEquals(typeof result.totalTime, "number");
   assertEquals(result.difficulty, 5);
   assertEquals(typeof result.isRankUp, "boolean");
+  assertEquals(typeof result.rankChange, "number");
   assertEquals(typeof result.maxStreak, "number");
 
   clearLocalStorage();
