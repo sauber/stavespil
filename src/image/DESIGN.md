@@ -27,4 +27,6 @@
     Pixabay → convert to Base64 → store in cache.
   - Level starts only when all 20 images are loaded.
 - **Fallback**: Show a placeholder image if API call fails.
+- **Verbose mode**: Image downloader supports an optional verbose mode that
+  prints number of images found, first image URL, byte size, and cache key.
 - **Attribution**: Display "Billeder fra Pixabay" in the game UI.

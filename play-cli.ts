@@ -36,7 +36,7 @@ const words = selectWords(groups, difficulty);
 printLine(`Level ${difficulty}`);
 
 const apiKey = await loadApiKey();
-const loader = imageLoader(apiKey);
+const loader = imageLoader(apiKey, true);
 
 const wordResults: WordResult[] = [];
 
@@ -52,8 +52,8 @@ try {
     const expected = [...word];
 
     printLine("");
-    await showImage(loader, word);
     printLine(word);
+    await showImage(loader, word);
 
     const startTime = Date.now();
     const slots = initSlots(word.length);
@@ -75,7 +75,7 @@ try {
         pos++;
       } else {
         errors++;
-        await flashWrong(slots, pos);
+        await flashWrong(slots, pos, ch);
       }
     }
 

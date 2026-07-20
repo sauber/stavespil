@@ -5,7 +5,7 @@ import { getPixels } from "@unpic/pixels";
 
 const TARGET_LINES = 20;
 const MASK = "_";
-const WRONG = "!";
+
 const FLASH_MS = 300;
 
 /** Fetch image for word, blockify, and print to terminal. */
@@ -45,12 +45,13 @@ export function renderSlots(slots: string[]): void {
   );
 }
 
-/** Briefly flash ! at slot position, then revert to _. */
+/** Briefly flash the typed key at slot position, then revert to _. */
 export async function flashWrong(
   slots: string[],
   pos: number,
+  ch: string,
 ): Promise<void> {
-  slots[pos] = WRONG;
+  slots[pos] = ch;
   renderSlots(slots);
   await new Promise((r) => setTimeout(r, FLASH_MS));
   slots[pos] = MASK;

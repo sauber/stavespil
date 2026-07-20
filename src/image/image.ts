@@ -37,12 +37,17 @@ function bytesToDataUrl(bytes: Uint8Array, mime: string): string {
 export async function getWordPicture(
   apiKey: string,
   word: string,
+  verbose = false,
 ): Promise<string> {
   const cacheKey = `${CACHE_PREFIX}${word}`;
 
   if (has(cacheKey)) {
     const dataUrl = get(cacheKey);
     if (dataUrl) {
+      if (verbose) {
+        console.log(`Cache key: ${cacheKey}`);
+        console.log(`Image size: ${dataUrl.length} bytes (data URL)`);
+      }
       return dataUrl;
     }
   }
@@ -77,6 +82,13 @@ export async function getWordPicture(
   const bytes = new Uint8Array(buffer);
   const dataUrl = bytesToDataUrl(bytes, contentType);
   set(cacheKey, dataUrl);
+
+  if (verbose) {
+    console.log(`Images found: ${hits.length}`);
+    console.log(`First image URL: ${imageUrl}`);
+    console.log(`Image size: ${buffer.byteLength} bytes`);
+    console.log(`Cache key: ${cacheKey}`);
+  }
 
   return dataUrl;
 }

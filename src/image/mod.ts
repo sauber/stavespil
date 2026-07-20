@@ -14,9 +14,9 @@ import { getWordPicture, dataUrlToBytes } from "./image.ts";
  * @param apiKey - Pixabay API key
  * @returns A function that loads image bytes for a given word
  */
-export function imageLoader(apiKey: string): MediaLoader {
+export function imageLoader(apiKey: string, verbose = false): MediaLoader {
   return async (word: string): Promise<Uint8Array> => {
-    const dataUrl = await getWordPicture(apiKey, word);
+    const dataUrl = await getWordPicture(apiKey, word, verbose);
     return dataUrlToBytes(dataUrl);
   };
 }
