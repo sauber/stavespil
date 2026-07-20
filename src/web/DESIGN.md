@@ -11,6 +11,16 @@ output.
 The browser handles all game logic, state management, and data storage.
 Vite serves the static files during development.
 
+## Intent
+
+Implement a full game round on `level.html`. When a player navigates to
+`/level/<n>`, the page loads the spell engine with 20 words for that difficulty,
+displays each word via image and sound, accepts letter input from both the
+on-screen keyboard and physical keyboard, cycles through all words, and on
+completion saves the round result (score, rank change, trophies) to the player
+profile in localStorage. The results screen shows score, errors, time, rank
+change, and any newly unlocked trophies.
+
 ## Tech Stack
 
 | Tool | Purpose |
@@ -155,8 +165,15 @@ middleware rewrites `/level/<number>` requests to serve `level.html`.
 
 - Parses `window.location.pathname` to extract the difficulty number.
 - Sets `document.title` to `"Level <difficulty>"`.
-- Currently a placeholder — will eventually load the spell engine for the
-  selected difficulty level.
+- Loads the spell engine with 20 words for the difficulty level.
+- Pre-fetches images (Pixabay) and sounds (VoiceRSS) for all words.
+- Renders the game screen: image, sound replay button, letter frames, on-screen
+  keyboard, progress indicator, and cheer messages.
+- Accepts letter input via physical keyboard (`keydown`) and on-screen keyboard
+  (click/tap).
+- Cycles through words automatically after each word is completed.
+- On round completion, computes score, checks trophies, saves result to
+  localStorage, and displays the results screen.
 
 ## Game Rules
 
