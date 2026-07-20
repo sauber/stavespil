@@ -130,6 +130,34 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 - Unlocked trophies: full color emoji + title + date earned.
 - Locked trophies: grayscale with a lock icon, hidden title.
 
+## Level Screen
+
+Entry point for a single game round. Each difficulty level has its own URL.
+
+### Routing
+
+| Route | Description |
+|-------|-------------|
+| `/level/1` | Difficulty level 1 |
+| `/level/100` | Difficulty level 100 |
+
+The difficulty number is extracted from the URL path. A Vite dev server
+middleware rewrites `/level/<number>` requests to serve `level.html`.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `level.html` | HTML entry point (root, alongside `index.html`) |
+| `src/web/level.ts` | Reads the difficulty from the URL path and sets the page title |
+
+### Behavior
+
+- Parses `window.location.pathname` to extract the difficulty number.
+- Sets `document.title` to `"Level <difficulty>"`.
+- Currently a placeholder — will eventually load the spell engine for the
+  selected difficulty level.
+
 ## Game Rules
 
 - Target audience: kids in grades 3–6.

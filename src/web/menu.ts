@@ -138,8 +138,9 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
   list.className = "level-list";
 
   for (let level = 0; level < 100; level++) {
-    const item = document.createElement("div");
+    const item = document.createElement("a");
     item.className = "level-item";
+    item.setAttribute("href", `/level/${level + 1}`);
 
     const words = groups[level]
       ? [...groups[level]]
@@ -153,9 +154,6 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
       <span class="level-number">${level + 1}.</span>
       <span class="level-words">${words}</span>
     `;
-    item.addEventListener("click", () => {
-      console.log(`Selected level: ${level + 1}`);
-    });
     list.appendChild(item);
   }
 

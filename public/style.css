@@ -118,6 +118,8 @@ h2 {
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
   transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
 }
 .level-item:hover {
   background: #B8F0C8;
