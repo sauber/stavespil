@@ -1,7 +1,6 @@
 import type { MediaLoader } from "../image/mod.ts";
 import { blockify } from "@sauber/block-image";
 import { Image } from "@cross/image";
-import { getPixels } from "@unpic/pixels";
 
 const TARGET_LINES = 20;
 const MASK = "_";
@@ -13,11 +12,10 @@ export async function showImage(
   loader: MediaLoader,
   word: string,
 ): Promise<void> {
-  const jpegBytes = await loader(word);
-  const { data, width, height } = await getPixels(jpegBytes);
-  const aspectRatio = width / height;
+  const imageBytes = await loader(word);
+  const image = await Image.decode(imageBytes);
+  const aspectRatio = image.width / image.height;
   const targetWidth = Math.ceil(TARGET_LINES * aspectRatio) * 2;
-  const image = Image.fromRGBA(width, height, data);
   image.resize({
     width: targetWidth,
     height: TARGET_LINES,

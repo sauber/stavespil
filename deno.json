@@ -3,7 +3,6 @@
     "@cross/image": "jsr:@cross/image@^0.4.3",
     "@sauber/block-image": "jsr:@sauber/block-image@^2.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
-    "@unpic/pixels": "jsr:@unpic/pixels@^1.2.3",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31"
   },
   "tasks": {
