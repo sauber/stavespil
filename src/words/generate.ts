@@ -167,14 +167,19 @@ export function retrieveWords(key = "wordList"): WordGroups {
   return JSON.parse(data);
 }
 
-// Main
-if (import.meta.main) {
-  console.log("Generating word list");
+/** Ensure the word database exists, generating it if necessary. */
+export async function ensureWords(): Promise<void> {
+  if (existsWords()) return;
+  console.log("Generating word database…");
   const zip: Uint8Array = await download();
   const source: WordList = await extract(zip);
   const picked: WordList = limitWords(source, 2000);
   const scored: WordList = scoreWords(picked);
   const groups: WordGroups = wordGroups(scored);
-  await storeWords(groups);
+  storeWords(groups);
   console.log("Done.");
+}
+
+if (import.meta.main) {
+  await ensureWords();
 }

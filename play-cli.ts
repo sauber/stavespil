@@ -1,4 +1,4 @@
-import { retrieveWords } from "./src/words/mod.ts";
+import { ensureWords, retrieveWords } from "./src/words/mod.ts";
 import { loadProfile } from "./src/player/mod.ts";
 import {
   selectWords,
@@ -26,6 +26,7 @@ async function loadApiKey(): Promise<string> {
   return match[1].trim();
 }
 
+await ensureWords();
 const groups = retrieveWords();
 const profile = loadProfile();
 const lastEntry = profile.roundHistory.at(-1);

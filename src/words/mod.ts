@@ -1,1 +1,1 @@
-export { retrieveWords } from "./generate.ts";
+export { ensureWords, retrieveWords } from "./generate.ts";
