@@ -8,16 +8,66 @@ Render the game UI in the browser. This module is the only one that touches the
 DOM. It receives state from the spell engine and translates it into visual
 output.
 
+The browser handles all game logic, state management, and data storage.
+Vite serves the static files during development.
+
 ## Tech Stack
 
 | Tool | Purpose |
 |------|---------|
-| Deno | Runtime |
-| Hono | HTTP server and routing |
-| Tailwind CSS | Utility-first styling |
-| recharts | Rank history line chart |
-| framer-motion | UI animations |
-| canvas-confetti | Trophy unlock celebration |
+| Vite | Dev server and bundler (serves native ES modules) |
+| Deno | Runtime (runs Vite, manages deps) |
+| Tailwind CSS | Utility-first styling (v4, CSS-first config) |
+| Chart.js | Rank history line chart |
+
+## Client-Side Data Architecture
+
+All game data lives in the browser. Vite only serves static files — there is
+no server-side game state.
+
+### localStorage Keys
+
+| Key                 | Module  | Contents                                              |
+| ------------------- | ------- | ----------------------------------------------------- |
+| `wordList`          | words   | Pre-generated word database (100 levels × 20 words)   |
+| `stavespil:mediaCache` | cache | LRU cache of Base64-encoded images and sounds (~5 MB) |
+| `roundHistory`      | player  | Array of round results (difficulty, score, rank, etc.) |
+
+### Data Flow
+
+1. On first load, `ensureWords()` downloads the word corpus from DSL, scores
+   it, and stores the result in localStorage under `wordList`.
+2. When a round starts, media (images, sounds) are fetched from external APIs,
+   cached in localStorage, and loaded into the engine as `Uint8Array`s.
+3. After each round, the player module appends to `roundHistory` and derives
+   current rank, earned trophies, and stats.
+
+### Why Browser-Only?
+
+- No server-side database or user accounts needed.
+- Works offline after initial media cache is populated.
+- Single-player game — no server-side state synchronization required.
+- localStorage is sufficient for the data volumes involved (word list is a
+  few hundred KB, media cache tops out at ~5 MB).
+
+## API Key Handling
+
+API keys for Pixabay and VoiceRSS are embedded directly in the client code
+(`app.ts`). Both APIs have free tiers with generous limits — no proxy server
+is needed.
+
+## Shared Types
+
+Shared types used across modules live in `src/gameState/mod.ts`:
+
+- `CheerInput` — input for the cheer function on each letter keypress
+- `Cheer` — a cheer message with text, emoji, style, and duration
+- `RoundResult` — result of a completed round (score, errors, time, rank change)
+- `PlayerStats` — cumulative player statistics (total rounds, difficulties, rank)
+- `EngineState` — complete state snapshot pushed to renderer on every change
+
+The spell module re-exports these from `src/spell/types.ts` for convenience.
+The web module should import from `src/gameState/mod.ts` directly.
 
 ## Visual Design
 

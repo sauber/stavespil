@@ -143,3 +143,8 @@ export function checkTrophies(
 
   return newlyUnlocked;
 }
+
+/** All trophy definitions (display metadata only, no conditions). */
+export function getAllTrophies(): Trophy[] {
+  return TROPHY_DEFINITIONS.map(({ condition: _c, ...trophy }) => trophy);
+}

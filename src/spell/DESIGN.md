@@ -147,7 +147,7 @@ All external interactions are injected:
 
 ```
 src/spell/
-├── types.ts         — Shared types (RoundResult, WordResult, ScoreResult)
+├── types.ts         — Local types + re-exports from src/gameState/mod.ts
 ├── score.ts         — Pure score calculation functions
 ├── engine.ts        — Game state machine
 ├── round.ts         — Round orchestration (word selection, media, lifecycle)
@@ -160,15 +160,23 @@ src/spell/
 
 ### Types (`types.ts`)
 
-All shared types are defined in `types.ts`:
+`types.ts` re-exports shared types from `src/gameState/mod.ts` and defines
+spell-specific types:
+
+**Re-exported from `src/gameState/mod.ts`:**
+
+- `Cheer` — a cheer message with text, emoji, style, and duration
+- `EngineState` — complete state snapshot pushed to renderer on every change
+- `PlayerStats` — player statistics for trophy checking (imported by reward module)
+- `RoundResult` — result of a completed round (score, errors, time, rank change)
+
+**Defined locally in `types.ts`:**
 
 - `WordResult` — result of a single word (word, errors, timing)
 - `ScoreResult` — score breakdown (errorScore, timeScore, combinedScore, rankChange, totalTime)
-- `RoundResult` — extends `ScoreResult` with difficulty and maxStreak
 - `Media` — image and sound as `Uint8Array`
 - `OnStateChange` — callback signature for state updates
 - `MediaLoader` — function that loads media for a word
-- `PlayerStats` — player statistics for trophy checking (imported by reward module)
 
 ### Engine State (`engine.ts`)
 

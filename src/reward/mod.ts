@@ -7,6 +7,7 @@ export {
 
 export {
   checkTrophies,
+  getAllTrophies,
   type Trophy,
   type StoredTrophy,
 } from "./trophy.ts";
