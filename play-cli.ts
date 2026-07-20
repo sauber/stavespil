@@ -48,11 +48,11 @@ try {
     Deno.exit(1);
   });
 
-  for (const word of words) {
+  for (const [i, word] of words.entries()) {
     const expected = [...word];
 
     printLine("");
-    printLine(word);
+    printLine(`Level ${difficulty} Word #${i + 1} of ${words.length}: ${word}`);
     await showImage(loader, word);
 
     const startTime = Date.now();
@@ -98,3 +98,7 @@ printLine(`Errors:   ${wordResults.reduce((s, r) => s + r.errors, 0)}`);
 printLine(`Time:     ${scoreResult.totalTime}s`);
 printLine(`Rank:     ${rankSymbol}`);
 printLine(`Streak:   ${maxStreak}`);
+
+// --- Attribution ---
+printLine("");
+printLine("Billeder fra Pixabay (pixabay.com)");
