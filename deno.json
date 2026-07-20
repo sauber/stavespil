@@ -3,13 +3,15 @@
     "@cross/image": "jsr:@cross/image@^0.4.3",
     "@sauber/block-image": "jsr:@sauber/block-image@^2.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
-    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31"
+    "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31",
+    "vite": "npm:vite@^8.1.5"
   },
   "tasks": {
     "image": "deno run --allow-net --allow-read --allow-write src/image/show.ts",
     "sound": "deno run --allow-net --allow-read --allow-write --allow-run src/sound/play.ts",
-    "words": "deno run --allow-net src/words/generate.ts",
-    "play": "deno run --allow-net --allow-read play-cli.ts"
+    "words": "deno run --allow-net --allow-read --allow-write src/words/generate.ts",
+    "play": "deno run --allow-net --allow-read play-cli.ts",
+    "web": "deno run -A npm:vite"
   },
   "lock": false
 }

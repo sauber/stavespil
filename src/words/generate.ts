@@ -150,17 +150,29 @@ export function wordGroups(source: WordList): WordGroups {
   return groups;
 }
 
-// Confirm words are stored in cache
-export function existsWords(key = "wordList"): boolean {
-  return localStorage.getItem(key) !== null;
+const DEFAULT_PATH = "public/words.json";
+
+// Confirm words are stored
+export async function existsWords(key?: string): Promise<boolean> {
+  if (key) return localStorage.getItem(key) !== null;
+  try {
+    await Deno.stat(DEFAULT_PATH);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-// Store words in cache
-export function storeWords(groups: WordGroups, key = "wordList"): void {
-  localStorage.setItem(key, JSON.stringify(groups));
+// Store words
+export async function storeWords(groups: WordGroups, key?: string): Promise<void> {
+  if (key) {
+    localStorage.setItem(key, JSON.stringify(groups));
+    return;
+  }
+  await Deno.writeTextFile(DEFAULT_PATH, JSON.stringify(groups));
 }
 
-// Load words from cache
+// Load words from localStorage (used by tests with custom keys)
 export function retrieveWords(key = "wordList"): WordGroups {
   const data = localStorage.getItem(key);
   if (data === null) return [];
@@ -169,14 +181,14 @@ export function retrieveWords(key = "wordList"): WordGroups {
 
 /** Ensure the word database exists, generating it if necessary. */
 export async function ensureWords(): Promise<void> {
-  if (existsWords()) return;
+  if (await existsWords()) return;
   console.log("Generating word database…");
   const zip: Uint8Array = await download();
   const source: WordList = await extract(zip);
   const picked: WordList = limitWords(source, 2000);
   const scored: WordList = scoreWords(picked);
   const groups: WordGroups = wordGroups(scored);
-  storeWords(groups);
+  await storeWords(groups);
   console.log("Done.");
 }
 

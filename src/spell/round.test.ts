@@ -1,9 +1,9 @@
 import { assertEquals, assert, assertRejects, assertThrows } from "@std/assert";
 import { createRound, selectWords } from "./round.ts";
 import type { EngineState, MediaLoader } from "./types.ts";
-import type { WordList } from "../words/generate.ts";
+import type { WordList, WordGroups } from "../words/generate.ts";
 
-function makeGroups(): WordList[] {
+function makeGroups(): WordGroups {
   const groups: WordList[] = [];
   for (let i = 0; i < 100; i++) {
     const words: WordList = [];
@@ -27,13 +27,21 @@ function mockSoundLoader(): MediaLoader {
   };
 }
 
-function setupLocalStorage(): void {
+let originalFetch: typeof globalThis.fetch;
+
+function setupMockFetch(): void {
   const groups = makeGroups();
-  localStorage.setItem("wordList", JSON.stringify(groups));
+  originalFetch = globalThis.fetch;
+  globalThis.fetch = (url: string | URL | Request): Promise<Response> => {
+    if (String(url) === "/words.json") {
+      return Promise.resolve(new Response(JSON.stringify(groups)));
+    }
+    return Promise.reject(new Error(`Unexpected fetch: ${url}`));
+  };
 }
 
-function clearLocalStorage(): void {
-  localStorage.removeItem("wordList");
+function teardownMockFetch(): void {
+  globalThis.fetch = originalFetch;
 }
 
 Deno.test("selectWords picks 20 words total", () => {
@@ -91,7 +99,7 @@ Deno.test("selectWords clamps difficulty=100 so above equals level", () => {
 });
 
 Deno.test("createRound fetches media and creates round", async () => {
-  setupLocalStorage();
+  setupMockFetch();
   const states: EngineState[] = [];
   const round = await createRound({
     difficulty: 5,
@@ -105,11 +113,13 @@ Deno.test("createRound fetches media and creates round", async () => {
   assertEquals(states[0].wordIndex, 0);
   assert(round.isComplete() === false);
 
-  clearLocalStorage();
+  teardownMockFetch();
 });
 
 Deno.test("createRound throws when word database is empty", async () => {
-  clearLocalStorage();
+  globalThis.fetch = (): Promise<Response> => {
+    return Promise.resolve(new Response(null, { status: 404 }));
+  };
   await assertRejects(
     () =>
       createRound({
@@ -119,12 +129,13 @@ Deno.test("createRound throws when word database is empty", async () => {
         onStateChange: () => {},
       }),
     Error,
-    "Word database not initialized",
+    "Failed to load words",
   );
+  teardownMockFetch();
 });
 
 Deno.test("round completes after 20 words", async () => {
-  setupLocalStorage();
+  setupMockFetch();
   const round = await createRound({
     difficulty: 1,
     imageLoader: mockImageLoader(),
@@ -143,11 +154,11 @@ Deno.test("round completes after 20 words", async () => {
   }
 
   assert(round.isComplete());
-  clearLocalStorage();
+  teardownMockFetch();
 });
 
 Deno.test("round.getResult returns valid RoundResult", async () => {
-  setupLocalStorage();
+  setupMockFetch();
   const round = await createRound({
     difficulty: 5,
     imageLoader: mockImageLoader(),
@@ -173,11 +184,11 @@ Deno.test("round.getResult returns valid RoundResult", async () => {
   assertEquals(typeof result.rankChange, "number");
   assertEquals(typeof result.maxStreak, "number");
 
-  clearLocalStorage();
+  teardownMockFetch();
 });
 
 Deno.test("round.getResult throws before completion", async () => {
-  setupLocalStorage();
+  setupMockFetch();
   const round = await createRound({
     difficulty: 1,
     imageLoader: mockImageLoader(),
@@ -186,11 +197,11 @@ Deno.test("round.getResult throws before completion", async () => {
   });
 
   assertThrows(() => round.getResult(), Error, "Round not yet completed");
-  clearLocalStorage();
+  teardownMockFetch();
 });
 
 Deno.test("round propagates state changes to callback", async () => {
-  setupLocalStorage();
+  setupMockFetch();
   const states: EngineState[] = [];
   const round = await createRound({
     difficulty: 1,
@@ -202,5 +213,5 @@ Deno.test("round propagates state changes to callback", async () => {
   round.enterLetter("o");
   assertEquals(states.length, 2);
 
-  clearLocalStorage();
+  teardownMockFetch();
 });

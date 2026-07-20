@@ -154,19 +154,19 @@ Deno.test({
   assert(words[0].word.length > 0, "First word should have content");
 });
 
-Deno.test("existsWords returns false when no cache", () => {
+Deno.test("existsWords returns false when no cache", async () => {
   localStorage.removeItem("wordList-test");
-  assertEquals(existsWords("wordList-test"), false);
+  assertEquals(await existsWords("wordList-test"), false);
 });
 
-Deno.test("storeWords and retrieveWords round-trip", () => {
+Deno.test("storeWords and retrieveWords round-trip", async () => {
   const groups = [
     [{ type: "NC", word: "kat", score: 0.5 }],
     [{ type: "A", word: "stor", score: 0.3 }],
   ];
-  storeWords(groups, "wordList-test");
+  await storeWords(groups, "wordList-test");
   const retrieved = retrieveWords("wordList-test");
   assertEquals(retrieved, groups);
-  assertEquals(existsWords("wordList-test"), true);
+  assertEquals(await existsWords("wordList-test"), true);
   localStorage.removeItem("wordList-test");
 });

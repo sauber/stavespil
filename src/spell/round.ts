@@ -1,4 +1,4 @@
-import { retrieveWords } from "../words/generate.ts";
+import { loadWords } from "../words/load.ts";
 import type { WordList } from "../words/generate.ts";
 import { createEngine } from "./engine.ts";
 import { computeScore, calculateMaxStreak } from "./score.ts";
@@ -95,7 +95,7 @@ function shuffle<T>(array: T[]): T[] {
  * @returns A Round object for gameplay
  */
 export async function createRound(config: RoundConfig): Promise<Round> {
-  const groups = retrieveWords();
+  const groups = await loadWords();
   if (groups.length === 0) {
     throw new Error("Word database not initialized. Run word generation first.");
   }
