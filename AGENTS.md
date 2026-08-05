@@ -19,7 +19,7 @@ and design choices, and an optional `TODO.md` for known issues.
 | `src/image/`  | Image fetching (Pixabay API)       |
 | `src/player/` | Player profile and rank management |
 | `src/reward/` | Cheers and trophies                |
-| `src/sound/`  | Sound fetching (VoiceRSS TTS)      |
+| `src/sound/`  | Word pronunciations (static MP3 files) |
 | `src/spell/`  | Core game engine (rounds, scoring) |
 | `src/web/`    | Web frontend (UI rendering)        |
 | `src/words/`  | Word database generation           |

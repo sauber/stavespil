@@ -97,6 +97,13 @@ export function createEngine(
     const isCorrect =
       letter.toLowerCase() === expected.toLowerCase();
 
+    if (isCorrect) {
+      state.frames[position] = letter;
+    } else {
+      state.wordErrors++;
+      state.totalErrors++;
+    }
+
     const cheerInput: CheerInput = {
       word,
       letterIndex: position,
@@ -104,13 +111,6 @@ export function createEngine(
       errorCount: state.wordErrors,
       isWordComplete: false,
     };
-
-    if (isCorrect) {
-      state.frames[position] = letter;
-    } else {
-      state.wordErrors++;
-      state.totalErrors++;
-    }
 
     state.cheer = onLetterInput(cheerInput);
 

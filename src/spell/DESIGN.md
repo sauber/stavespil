@@ -314,7 +314,7 @@ function calculateTotalTime(wordResults: WordResult[]): number;
 | `src/reward/mod.ts` | `engine.ts` | `onLetterInput()` for cheer messages, `resetLevel()` at round start |
 | `src/words/mod.ts` | `round.ts` | `retrieveWords()` to load word groups |
 | `src/image/mod.ts` | caller | Provides `imageLoader` via config |
-| `src/sound/mod.ts` | caller | Provides `soundLoader` via config |
+| `src/sound/mod.ts` | caller | Provides sound loading via config |
 
 ### Test Strategy
 

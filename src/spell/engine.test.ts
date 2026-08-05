@@ -53,6 +53,31 @@ Deno.test("engine increments errors on wrong letter", () => {
   assertEquals(state.totalErrors, 1);
 });
 
+Deno.test("engine reports proper cheer on first wrong letter", () => {
+  const capture = makeStateCapture();
+  const engine = createEngine(["kat"], [makeMedia()], capture.capture);
+  engine.enterLetter("x");
+  const state = capture.last();
+  assertEquals(state.cheer?.text, "Ups! Prøv igen");
+  assertEquals(state.cheer?.emoji, "😊");
+});
+
+Deno.test("engine escalates cheer messages on repeated wrong letters", () => {
+  const capture = makeStateCapture();
+  const engine = createEngine(["kat"], [makeMedia()], capture.capture);
+  engine.enterLetter("x");
+  engine.enterLetter("y");
+  engine.enterLetter("z");
+  engine.enterLetter("q");
+  const texts = capture.get().slice(1).map((s) => s.cheer?.text);
+  assertEquals(texts, [
+    "Ups! Prøv igen",
+    "Tænk på lyden!",
+    "Du kan godt!",
+    "Se bogstaverne der lyser!",
+  ]);
+});
+
 Deno.test("engine is case-insensitive", () => {
   const capture = makeStateCapture();
   const engine = createEngine(["kat"], [makeMedia()], capture.capture);

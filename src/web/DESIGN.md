@@ -52,9 +52,21 @@ no server-side game state.
 
 ## API Key Handling
 
-API keys for Pixabay and VoiceRSS are embedded directly in the client code
-(`app.ts`). Both APIs have free tiers with generous limits — no proxy server
-is needed.
+The Pixabay API key is stored in the project root `.env` file and exposed to
+the browser via Vite's env system. Only `VITE_`-prefixed variables are inlined
+into client code by the Vite dev server at startup.
+
+- `.env` contains `VITE_PIXABAY_API_KEY`
+- The round page reads it via `import.meta.env.VITE_PIXABAY_API_KEY`
+- Sound needs no key: pronunciations are pre-generated static MP3 files in
+  `public/sounds/` (see `src/sound/DESIGN.md`), fetched by `staticSoundLoader`
+
+## Pages
+
+- `/` — menu page (`index.html`, `src/web/menu.ts`)
+- `/round/N` — round page for level N (`round.html`, `src/web/round.ts`). The
+  clean URL is rewritten to `/round.html?level=N` by the Vite plugin in
+  `vite.config.ts`.
 
 ## Shared Types
 

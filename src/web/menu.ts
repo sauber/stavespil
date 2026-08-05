@@ -154,7 +154,7 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
       <span class="level-words">${words}</span>
     `;
     item.addEventListener("click", () => {
-      console.log(`Selected level: ${level + 1}`);
+      location.href = `/round/${level + 1}`;
     });
     list.appendChild(item);
   }

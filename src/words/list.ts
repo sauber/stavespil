@@ -10,7 +10,7 @@ const shuffle = (words: Array<string>) =>
   words.sort((_) => Math.random() - 0.5);
 
 // Confirm word list retrieved
-const generated: boolean = existsWords();
+const generated: boolean = await existsWords();
 if (!generated) throw new Error("Word list is not cached");
 
 // Print out some words from wordlist

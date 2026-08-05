@@ -19,7 +19,7 @@ src/
 ├── image/      — Image fetching (Pixabay API)
 ├── player/     — Player profile and rank management
 ├── reward/     — Cheers (inline feedback) and trophies (achievements)
-├── sound/      — Sound fetching (VoiceRSS TTS)
+├── sound/      — Word pronunciations (static MP3 files)
 ├── spell/      — Core game engine (round orchestration, scoring)
 ├── web/        — Web frontend (UI rendering)
 └── words/      — Word database generation and storage
