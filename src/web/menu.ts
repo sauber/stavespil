@@ -1,11 +1,13 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
-import { loadProfile, getEarnedTrophyIds, buildPlayerStats } from "../player/mod.ts";
+import {
+  buildPlayerStats,
+  getEarnedTrophyIds,
+  loadProfile,
+} from "../player/mod.ts";
 import { getAllTrophies } from "../reward/mod.ts";
 import { loadWords } from "../words/load.ts";
 import type { WordGroups } from "../words/generate.ts";
-
-
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString("da-DK", {
@@ -15,7 +17,9 @@ function formatDate(ts: number): string {
   });
 }
 
-function renderRankHistory(profile: ReturnType<typeof loadProfile>): HTMLElement {
+function renderRankHistory(
+  profile: ReturnType<typeof loadProfile>,
+): HTMLElement {
   const section = document.createElement("section");
   const stats = buildPlayerStats(profile);
 
@@ -42,7 +46,8 @@ function renderRankHistory(profile: ReturnType<typeof loadProfile>): HTMLElement
   if (profile.roundHistory.length === 0) {
     const empty = document.createElement("p");
     empty.className = "empty-message";
-    empty.textContent = "Ingen spillede baner endnu. Vælg et niveau for at komme i gang!";
+    empty.textContent =
+      "Ingen spillede baner endnu. Vælg et niveau for at komme i gang!";
     section.appendChild(empty);
     return section;
   }
@@ -66,10 +71,12 @@ function renderRankHistory(profile: ReturnType<typeof loadProfile>): HTMLElement
   const entries = [...profile.roundHistory].reverse();
   for (const entry of entries) {
     const tr = document.createElement("tr");
-    const rankClass =
-      entry.result > 0 ? "rank-up" : entry.result < 0 ? "rank-down" : "rank-same";
-    const rankSymbol =
-      entry.result > 0 ? "▲" : entry.result < 0 ? "▼" : "—";
+    const rankClass = entry.result > 0
+      ? "rank-up"
+      : entry.result < 0
+      ? "rank-down"
+      : "rank-same";
+    const rankSymbol = entry.result > 0 ? "▲" : entry.result < 0 ? "▼" : "—";
     tr.innerHTML = `
       <td>${formatDate(entry.timestamp)}</td>
       <td>${entry.difficulty}</td>
@@ -138,15 +145,16 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
   list.className = "level-list";
 
   for (let level = 0; level < 100; level++) {
-    const item = document.createElement("div");
+    const item = document.createElement("a");
     item.className = "level-item";
+    item.setAttribute("href", `/level/${level + 1}`);
 
     const words = groups[level]
       ? [...groups[level]]
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((w) => w.word)
-          .join(", ")
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3)
+        .map((w) => w.word)
+        .join(", ")
       : "...";
 
     item.innerHTML = `

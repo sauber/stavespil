@@ -23,7 +23,9 @@ function roundPageRewrite() {
     configureServer(server: { middlewares: { use(fn: unknown): void } }) {
       server.middlewares.use(middleware());
     },
-    configurePreviewServer(server: { middlewares: { use(fn: unknown): void } }) {
+    configurePreviewServer(
+      server: { middlewares: { use(fn: unknown): void } },
+    ) {
       server.middlewares.use(middleware());
     },
   };

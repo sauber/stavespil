@@ -11,6 +11,16 @@ output.
 The browser handles all game logic, state management, and data storage.
 Vite serves the static files during development.
 
+## Intent
+
+Implement a full game round on `level.html`. When a player navigates to
+`/level/<n>`, the page loads the spell engine with 20 words for that difficulty,
+displays each word via image and sound, accepts letter input from both the
+on-screen keyboard and physical keyboard, cycles through all words, and on
+completion saves the round result (score, rank change, trophies) to the player
+profile in localStorage. The results screen shows score, errors, time, rank
+change, and any newly unlocked trophies.
+
 ## Tech Stack
 
 | Tool | Purpose |
@@ -141,6 +151,41 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 - Grid of trophy cards displayed below the level list.
 - Unlocked trophies: full color emoji + title + date earned.
 - Locked trophies: grayscale with a lock icon, hidden title.
+
+## Level Screen
+
+Entry point for a single game round. Each difficulty level has its own URL.
+
+### Routing
+
+| Route | Description |
+|-------|-------------|
+| `/level/1` | Difficulty level 1 |
+| `/level/100` | Difficulty level 100 |
+
+The difficulty number is extracted from the URL path. A Vite dev server
+middleware rewrites `/level/<number>` requests to serve `level.html`.
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `level.html` | HTML entry point (root, alongside `index.html`) |
+| `src/web/level.ts` | Reads the difficulty from the URL path and sets the page title |
+
+### Behavior
+
+- Parses `window.location.pathname` to extract the difficulty number.
+- Sets `document.title` to `"Level <difficulty>"`.
+- Loads the spell engine with 20 words for the difficulty level.
+- Pre-fetches images (Pixabay) and sounds (VoiceRSS) for all words.
+- Renders the game screen: image, sound replay button, letter frames, on-screen
+  keyboard, progress indicator, and cheer messages.
+- Accepts letter input via physical keyboard (`keydown`) and on-screen keyboard
+  (click/tap).
+- Cycles through words automatically after each word is completed.
+- On round completion, computes score, checks trophies, saves result to
+  localStorage, and displays the results screen.
 
 ## Game Rules
 
