@@ -41,6 +41,22 @@ Deno.test("limitWords returns at most count words", () => {
   assertEquals(result[1].word, "gh");
 });
 
+Deno.test("limitWords deduplicates words with same string, keeping highest score", () => {
+  const source = [
+    { type: "C", word: "at", score: 0.1 },
+    { type: "U", word: "at", score: 0.3 },
+    { type: "NC", word: "kat", score: 0.5 },
+    { type: "T", word: "for", score: 0.2 },
+    { type: "C", word: "for", score: 0.4 },
+  ];
+  const result = limitWords(source, 10);
+  const words = result.map((w) => w.word);
+  assertEquals(words.filter((w) => w === "at").length, 1);
+  assertEquals(words.filter((w) => w === "for").length, 1);
+  assertEquals(result.find((w) => w.word === "at")!.score, 0.3);
+  assertEquals(result.find((w) => w.word === "for")!.score, 0.4);
+});
+
 Deno.test("limitWords returns empty array when no words have 2+ chars", () => {
   const source = [
     { type: "NC", word: "a", score: 0.1 },

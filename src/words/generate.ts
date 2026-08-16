@@ -37,10 +37,17 @@ export async function extract(file: Uint8Array): Promise<WordList> {
   return result;
 }
 
-/** Pick most frequent words having 2 letters or more */
+/** Pick most frequent unique words having 2 letters or more */
 export function limitWords(source: WordList, count: number): WordList {
-  return source
-    .filter((w) => w.word.length >= 2)
+  const byWord = new Map<string, WordEntry>();
+  for (const entry of source) {
+    if (entry.word.length < 2) continue;
+    const existing = byWord.get(entry.word);
+    if (!existing || entry.score > existing.score) {
+      byWord.set(entry.word, entry);
+    }
+  }
+  return [...byWord.values()]
     .sort((a, b) => b.score - a.score)
     .slice(0, count);
 }
