@@ -15,13 +15,24 @@ import { checkTrophies } from "../reward/mod.ts";
 import type { Trophy } from "../reward/mod.ts";
 
 const DANISH_LETTERS = [..."abcdefghijklmnopqrstuvwxyzæøå"];
+const KEYBOARD_ROWS = [
+  [..."qwertyuiopå"],
+  [..."asdfghjklæø"],
+  [..."zxcvbnm"],
+];
 const ADVANCE_DELAY_MS = 1600;
 
 let app: HTMLElement;
 let round: Round;
+const pathMatch = /^\/round\/(\d+)/.exec(location.pathname);
 const difficulty = Math.max(
   1,
-  Math.min(100, Number(new URLSearchParams(location.search).get("level")) || 1),
+  Math.min(
+    100,
+    pathMatch
+      ? Number(pathMatch[1])
+      : Number(new URLSearchParams(location.search).get("level")) || 1,
+  ),
 );
 let lastWordIndex = -1;
 let prevWordErrors = 0;
@@ -31,6 +42,8 @@ let currentImageUrl: string | null = null;
 let currentSoundUrl: string | null = null;
 let audioEl: HTMLAudioElement;
 let completed = false;
+let frameErrorSeen = 0;
+let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];
@@ -39,6 +52,18 @@ function shuffle<T>(array: T[]): T[] {
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+function flashKey(letter: string): HTMLElement | null {
+  const key = app?.querySelector<HTMLElement>(`.key[data-letter="${letter}"]`);
+  if (key) key.classList.add("pressed");
+  return key;
+}
+
+function clearPressedKeys(): void {
+  app?.querySelectorAll<HTMLElement>(".key.pressed").forEach((el) => {
+    el.classList.remove("pressed");
+  });
 }
 
 function createApp(): void {
@@ -72,15 +97,39 @@ function createApp(): void {
   );
 
   const keyboard = app.querySelector<HTMLElement>(".keyboard")!;
-  for (const letter of DANISH_LETTERS) {
-    const key = document.createElement("button");
-    key.className = "key";
-    key.type = "button";
-    key.dataset.letter = letter;
-    key.textContent = letter.toUpperCase();
-    key.addEventListener("click", () => round.enterLetter(letter));
-    keyboard.appendChild(key);
+  for (const row of KEYBOARD_ROWS) {
+    const rowEl = document.createElement("div");
+    rowEl.className = "keyboard-row";
+    for (const letter of row) {
+      const key = document.createElement("button");
+      key.className = "key";
+      key.type = "button";
+      key.dataset.letter = letter;
+      key.textContent = letter.toUpperCase();
+      key.addEventListener("click", () => {
+        round.enterLetter(letter);
+        key.blur();
+      });
+      key.addEventListener("mouseup", () => key.classList.remove("pressed"));
+      rowEl.appendChild(key);
+    }
+    keyboard.appendChild(rowEl);
   }
+
+  const letterSet = new Set(DANISH_LETTERS);
+  keydownHandler = (e: KeyboardEvent) => {
+    if (completed) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const ch = e.key.toLowerCase();
+    if (ch.length === 1 && letterSet.has(ch)) {
+      e.preventDefault();
+      clearPressedKeys();
+      flashKey(ch);
+      round.enterLetter(ch);
+    }
+  };
+  document.addEventListener("keydown", keydownHandler);
+  document.addEventListener("keyup", () => clearPressedKeys());
 }
 
 function showError(message: string): void {
@@ -135,12 +184,20 @@ function renderHeader(state: EngineState): void {
 function renderFrames(state: EngineState): void {
   const framesEl = app.querySelector<HTMLElement>(".letter-frames")!;
   framesEl.innerHTML = "";
-  for (const frame of state.frames) {
+  const currentPos = state.frames.filter((f) => f !== null).length;
+  const isError = state.wordErrors > frameErrorSeen;
+  for (let i = 0; i < state.frames.length; i++) {
+    const frame = state.frames[i];
     const div = document.createElement("div");
-    div.className = `letter-frame ${frame ? "filled" : "empty"}`;
+    let cls = `letter-frame ${frame ? "filled" : "empty"}`;
+    if (!frame && isError && i === currentPos) {
+      cls += " wrong";
+    }
+    div.className = cls;
     if (frame) div.textContent = frame.toUpperCase();
     framesEl.appendChild(div);
   }
+  frameErrorSeen = state.wordErrors;
 }
 
 function renderCheer(state: EngineState): void {
@@ -186,6 +243,7 @@ function handleState(state: EngineState): void {
   if (state.wordIndex !== lastWordIndex) {
     lastWordIndex = state.wordIndex;
     prevWordErrors = 0;
+    frameErrorSeen = 0;
     activeLetters = new Set(DANISH_LETTERS);
     updateImage(state.image);
     updateSound(state.sound);
@@ -270,6 +328,12 @@ function renderResult(result: RoundResult, newRank: number, trophies: Trophy[]):
 function completeRound(): void {
   if (completed) return;
   completed = true;
+
+  if (keydownHandler) {
+    document.removeEventListener("keydown", keydownHandler);
+    document.removeEventListener("keyup", clearPressedKeys);
+    keydownHandler = null;
+  }
 
   const result = round.getResult();
   const profile = loadProfile();

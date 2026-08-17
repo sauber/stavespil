@@ -17,31 +17,11 @@ function formatDate(ts: number): string {
   });
 }
 
-function renderRankHistory(
+function renderProgression(
   profile: ReturnType<typeof loadProfile>,
 ): HTMLElement {
   const section = document.createElement("section");
   const stats = buildPlayerStats(profile);
-
-  const display = document.createElement("div");
-  display.className = "rank-display";
-  display.innerHTML = `
-    <div class="rank-number">${stats.currentRank}</div>
-    <div class="rank-label">Nuværende niveau</div>
-  `;
-  section.appendChild(display);
-
-  const badges = document.createElement("div");
-  badges.className = "stats-row";
-  badges.innerHTML = `
-    <span class="stat-badge">Baner: ${stats.totalRounds}</span>
-    <span class="stat-badge">Niveauer: ${stats.distinctDifficulties.length}</span>
-  `;
-  section.appendChild(badges);
-
-  const heading = document.createElement("h2");
-  heading.textContent = "Rangoversigt";
-  section.appendChild(heading);
 
   if (profile.roundHistory.length === 0) {
     const empty = document.createElement("p");
@@ -49,45 +29,166 @@ function renderRankHistory(
     empty.textContent =
       "Ingen spillede baner endnu. Vælg et niveau for at komme i gang!";
     section.appendChild(empty);
+
+    const levelBtn = document.createElement("a");
+    levelBtn.className = "level-button";
+    levelBtn.setAttribute("href", "/round/1");
+    levelBtn.textContent = "Spil niveau 1";
+    section.appendChild(levelBtn);
+
     return section;
   }
 
-  const table = document.createElement("table");
-  table.className = "history-table";
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Dato</th>
-        <th>Niveau</th>
-        <th>Score</th>
-        <th>Fejl</th>
-        <th>Tid</th>
-        <th>Rang</th>
-      </tr>
-    </thead>
-  `;
-  const tbody = document.createElement("tbody");
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 560 200");
+  svg.classList.add("chart");
 
-  const entries = [...profile.roundHistory].reverse();
-  for (const entry of entries) {
-    const tr = document.createElement("tr");
-    const rankClass = entry.result > 0
-      ? "rank-up"
-      : entry.result < 0
-      ? "rank-down"
-      : "rank-same";
-    const rankSymbol = entry.result > 0 ? "▲" : entry.result < 0 ? "▼" : "—";
-    tr.innerHTML = `
-      <td>${formatDate(entry.timestamp)}</td>
-      <td>${entry.difficulty}</td>
-      <td>${entry.errors} fejl</td>
-      <td>${Math.round(entry.totalTime)}s</td>
-      <td class="${rankClass}">${rankSymbol} ${entry.newRank}</td>
-    `;
-    tbody.appendChild(tr);
+  const padL = 36;
+  const padR = 12;
+  const padT = 12;
+  const padB = 32;
+  const w = 560 - padL - padR;
+  const h = 200 - padT - padB;
+
+  const entries = [...profile.roundHistory];
+  const minX = entries[0].timestamp;
+  const maxX = entries[entries.length - 1].timestamp;
+  const rangeX = maxX - minX || 1;
+
+  const padY = 4;
+  const minDiff = Math.max(1, Math.min(...entries.map((e) => e.difficulty)) - padY);
+  const maxDiff = Math.min(100, Math.max(...entries.map((e) => e.difficulty)) + padY);
+  const rangeDiff = maxDiff - minDiff || 1;
+
+  function x(ts: number): number {
+    return padL + ((ts - minX) / rangeX) * w;
   }
-  table.appendChild(tbody);
-  section.appendChild(table);
+  function y(d: number): number {
+    return padT + h - ((d - minDiff) / rangeDiff) * h;
+  }
+
+  // grid lines
+  const yTicks = 5;
+  for (let i = 0; i <= yTicks; i++) {
+    const val = minDiff + (rangeDiff * i) / yTicks;
+    const yy = y(val);
+    const line = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "line",
+    );
+    line.setAttribute("x1", String(padL));
+    line.setAttribute("x2", String(padL + w));
+    line.setAttribute("y1", String(yy));
+    line.setAttribute("y2", String(yy));
+    line.setAttribute("stroke", "#e0e0e0");
+    line.setAttribute("stroke-width", "1");
+    svg.appendChild(line);
+
+    const label = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text",
+    );
+    label.setAttribute("x", String(padL - 6));
+    label.setAttribute("y", String(yy + 4));
+    label.setAttribute("text-anchor", "end");
+    label.setAttribute("font-size", "10");
+    label.setAttribute("fill", "#999");
+    label.textContent = String(Math.round(val));
+    svg.appendChild(label);
+  }
+
+  // axis labels
+  const yLabel = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "text",
+  );
+  yLabel.setAttribute("x", "8");
+  yLabel.setAttribute("y", String(padT + h / 2));
+  yLabel.setAttribute("text-anchor", "middle");
+  yLabel.setAttribute("font-size", "10");
+  yLabel.setAttribute("fill", "#999");
+  yLabel.setAttribute(
+    "transform",
+    `rotate(-90, 8, ${padT + h / 2})`,
+  );
+  yLabel.textContent = "Sværhedsgrad";
+  svg.appendChild(yLabel);
+
+  // x-axis date labels — skip any that would overlap
+  const minLabelGap = 70;
+  let lastLabelX = -Infinity;
+  for (const e of entries) {
+    const lx = x(e.timestamp);
+    if (lx - lastLabelX < minLabelGap) continue;
+    lastLabelX = lx;
+
+    const label = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text",
+    );
+    label.setAttribute("x", String(lx));
+    label.setAttribute("y", String(padT + h + 20));
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("font-size", "9");
+    label.setAttribute("fill", "#999");
+    label.textContent = formatDate(e.timestamp);
+    svg.appendChild(label);
+
+    const tick = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "line",
+    );
+    tick.setAttribute("x1", String(lx));
+    tick.setAttribute("x2", String(lx));
+    tick.setAttribute("y1", String(padT + h));
+    tick.setAttribute("y2", String(padT + h + 4));
+    tick.setAttribute("stroke", "#ccc");
+    tick.setAttribute("stroke-width", "1");
+    svg.appendChild(tick);
+  }
+
+  // line path
+  const d = entries
+    .map((e, i) => `${i === 0 ? "M" : "L"}${x(e.timestamp).toFixed(1)},${y(e.difficulty).toFixed(1)}`)
+    .join(" ");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill", "none");
+  path.setAttribute("stroke", "#8BC6F5");
+  path.setAttribute("stroke-width", "2.5");
+  path.setAttribute("stroke-linejoin", "round");
+  svg.appendChild(path);
+
+  // dots
+  for (const e of entries) {
+    const circle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle",
+    );
+    circle.setAttribute("cx", String(x(e.timestamp)));
+    circle.setAttribute("cy", String(y(e.difficulty)));
+    circle.setAttribute("r", "3.5");
+    circle.setAttribute("fill", "#5BA8DE");
+    svg.appendChild(circle);
+  }
+
+  const container = document.createElement("div");
+  container.className = "chart-container";
+  container.appendChild(svg);
+  section.appendChild(container);
+
+  const statsRow = document.createElement("div");
+  statsRow.className = "stats-row";
+  statsRow.innerHTML = `
+    <span class="stat-badge">Baner: ${stats.totalRounds}</span>
+  `;
+  section.appendChild(statsRow);
+
+  const levelBtn = document.createElement("a");
+  levelBtn.className = "level-button";
+  levelBtn.setAttribute("href", `/round/${stats.currentRank}`);
+  levelBtn.textContent = `Spil niveau ${stats.currentRank}`;
+  section.appendChild(levelBtn);
 
   return section;
 }
@@ -179,7 +280,7 @@ async function render(): Promise<void> {
   if (h1) h1.textContent = "StaveSpil";
 
   const app = document.createElement("main");
-  app.appendChild(renderRankHistory(profile));
+  app.appendChild(renderProgression(profile));
   app.appendChild(renderTrophies(profile));
   app.appendChild(renderLevelSelection(groups));
 
