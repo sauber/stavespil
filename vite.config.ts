@@ -33,4 +33,12 @@ function roundPageRewrite() {
 
 export default {
   plugins: [roundPageRewrite()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        round: "round.html",
+      },
+    },
+  },
 };

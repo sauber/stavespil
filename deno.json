@@ -13,7 +13,15 @@
     "sound:download": "deno run --allow-net --allow-read --allow-write --allow-env src/sound/generate.ts",
     "words": "deno run --allow-net --allow-read --allow-write src/words/generate.ts",
     "play": "deno run --allow-net --allow-read play-cli.ts",
-    "web": "deno run -A npm:vite"
+    "web": "deno run -A npm:vite",
+    "build": "deno run -A npm:vite build",
+    "start": "deno run -A server.ts"
   },
-  "lock": false
+  "lock": false,
+  "deploy": {
+    "org": "sauber",
+    "app": "stavemester"
+  }
 }
+
+
