@@ -1,5 +1,29 @@
 import { fromFileUrl } from "jsr:@std/path@^1";
-const DIST = fromFileUrl(new URL("./dist/", import.meta.url));
+import { join } from "jsr:@std/path@^1";
+
+const ROOT = fromFileUrl(new URL("./", import.meta.url));
+const DIST = join(ROOT, "dist");
+
+async function ensureDist(): Promise<void> {
+  try {
+    await Deno.stat(join(DIST, "index.html"));
+  } catch {
+    console.log("dist/ not found — running vite build...");
+    const cmd = new Deno.Command("deno", {
+      args: ["run", "-A", "npm:vite", "build"],
+      cwd: ROOT,
+      stdout: "inherit",
+      stderr: "inherit",
+    });
+    const status = await cmd.output();
+    if (!status.success) {
+      throw new Error("vite build failed");
+    }
+    console.log("Build complete.");
+  }
+}
+
+await ensureDist();
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -20,7 +44,7 @@ function mime(path: string): string {
 
 async function serveFile(path: string): Promise<Response> {
   try {
-    const data = await Deno.readFile(`${DIST}${path}`);
+    const data = await Deno.readFile(join(DIST, path));
     return new Response(data, { headers: { "content-type": mime(path) } });
   } catch {
     return new Response("Not found", { status: 404 });
@@ -29,7 +53,7 @@ async function serveFile(path: string): Promise<Response> {
 
 async function serveRound(): Promise<Response> {
   try {
-    const data = await Deno.readFile(`${DIST}round.html`);
+    const data = await Deno.readFile(join(DIST, "round.html"));
     return new Response(data, {
       headers: { "content-type": "text/html; charset=utf-8" },
     });
