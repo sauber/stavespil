@@ -277,7 +277,7 @@ async function render(): Promise<void> {
   const groups = await loadWords();
 
   const h1 = document.querySelector("h1");
-  if (h1) h1.textContent = "StaveSpil";
+  if (h1) h1.textContent = "Stave Mester";
 
   const app = document.createElement("main");
   app.appendChild(renderProgression(profile));
