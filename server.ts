@@ -1,33 +1,30 @@
 import { join } from "jsr:@std/path@^1";
 
-const DIST = join(Deno.cwd(), "dist");
+const cwd = Deno.cwd();
 
-async function ensureDist(): Promise<void> {
-  try {
-    await Deno.stat(join(DIST, "index.html"));
-    return;
-  } catch {
-    // dist/ missing — try to build
-  }
-  console.log("dist/ not found — running vite build...");
-  try {
-    const cmd = new Deno.Command(Deno.execPath(), {
-      args: ["run", "-A", "npm:vite", "build"],
-      stdout: "inherit",
-      stderr: "inherit",
-    });
-    const status = await cmd.output();
-    if (!status.success) {
-      console.error("vite build failed");
-    } else {
-      console.log("Build complete.");
-    }
-  } catch (e) {
-    console.error("Could not run build:", e);
-  }
+function fromFileUrlSafe(url: URL): string {
+  const p = url.pathname;
+  return Deno.build.os === "windows" ? p.slice(1) : p;
 }
 
-await ensureDist();
+const metaParent = fromFileUrlSafe(new URL("./", import.meta.url));
+
+const candidates = [
+  join(cwd, "dist"),
+  join(metaParent, "dist"),
+  join(cwd, "src", "web"),
+];
+
+let DIST = candidates[0];
+for (const c of candidates) {
+  try {
+    await Deno.stat(join(c, "index.html"));
+    DIST = c;
+    break;
+  } catch { /* try next */ }
+}
+
+const DIAG = JSON.stringify({ cwd, metaParent, DIST });
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -69,6 +66,12 @@ async function serveRound(): Promise<Response> {
 Deno.serve((req) => {
   const url = new URL(req.url);
   const { pathname } = url;
+
+  if (pathname === "/_diag") {
+    return new Response(DIAG, {
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
+  }
 
   if (/^\/round\/\d+/.test(pathname)) {
     return serveRound();
