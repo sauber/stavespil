@@ -147,7 +147,7 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
   for (let level = 0; level < 100; level++) {
     const item = document.createElement("a");
     item.className = "level-item";
-    item.setAttribute("href", `/level/${level + 1}`);
+    item.setAttribute("href", `/round/${level + 1}`);
 
     const words = groups[level]
       ? [...groups[level]]

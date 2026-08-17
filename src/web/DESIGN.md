@@ -13,8 +13,8 @@ Vite serves the static files during development.
 
 ## Intent
 
-Implement a full game round on `level.html`. When a player navigates to
-`/level/<n>`, the page loads the spell engine with 20 words for that difficulty,
+Implement a full game round on `round.html`. When a player navigates to
+`/round/<n>`, the page loads the spell engine with 20 words for that difficulty,
 displays each word via image and sound, accepts letter input from both the
 on-screen keyboard and physical keyboard, cycles through all words, and on
 completion saves the round result (score, rank change, trophies) to the player
@@ -40,15 +40,16 @@ no server-side game state.
 | Key                 | Module  | Contents                                              |
 | ------------------- | ------- | ----------------------------------------------------- |
 | `wordList`          | words   | Pre-generated word database (100 levels × 20 words)   |
-| `stavespil:mediaCache` | cache | LRU cache of Base64-encoded images and sounds (~5 MB) |
+| `stavespil:mediaCache` | cache | LRU cache of Base64-encoded images (~5 MB) |
 | `roundHistory`      | player  | Array of round results (difficulty, score, rank, etc.) |
 
 ### Data Flow
 
 1. On first load, `ensureWords()` downloads the word corpus from DSL, scores
    it, and stores the result in localStorage under `wordList`.
-2. When a round starts, media (images, sounds) are fetched from external APIs,
+2. When a round starts, media (images) are fetched from external APIs,
    cached in localStorage, and loaded into the engine as `Uint8Array`s.
+   Sounds are pre-generated static MP3 files in `public/sounds/`.
 3. After each round, the player module appends to `roundHistory` and derives
    current rank, earned trophies, and stats.
 
@@ -152,40 +153,7 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 - Unlocked trophies: full color emoji + title + date earned.
 - Locked trophies: grayscale with a lock icon, hidden title.
 
-## Level Screen
 
-Entry point for a single game round. Each difficulty level has its own URL.
-
-### Routing
-
-| Route | Description |
-|-------|-------------|
-| `/level/1` | Difficulty level 1 |
-| `/level/100` | Difficulty level 100 |
-
-The difficulty number is extracted from the URL path. A Vite dev server
-middleware rewrites `/level/<number>` requests to serve `level.html`.
-
-### Files
-
-| File | Purpose |
-|------|---------|
-| `level.html` | HTML entry point (root, alongside `index.html`) |
-| `src/web/level.ts` | Reads the difficulty from the URL path and sets the page title |
-
-### Behavior
-
-- Parses `window.location.pathname` to extract the difficulty number.
-- Sets `document.title` to `"Level <difficulty>"`.
-- Loads the spell engine with 20 words for the difficulty level.
-- Pre-fetches images (Pixabay) and sounds (VoiceRSS) for all words.
-- Renders the game screen: image, sound replay button, letter frames, on-screen
-  keyboard, progress indicator, and cheer messages.
-- Accepts letter input via physical keyboard (`keydown`) and on-screen keyboard
-  (click/tap).
-- Cycles through words automatically after each word is completed.
-- On round completion, computes score, checks trophies, saves result to
-  localStorage, and displays the results screen.
 
 ## Game Rules
 

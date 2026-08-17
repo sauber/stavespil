@@ -53,7 +53,7 @@ src/<module>/
 | ---- | ---------- | -------- |
 | Markdown docs | UPPERCASE.md | `DESIGN.md`, `TODO.md`, `ARCHITECTURE.md` |
 | Code files | `lowercase.ts` (single word preferred) | `trophy.ts`, `cache.ts` |
-| Code variations | `kebab-case.ts` (only when needed) | `image-cache.ts`, `sound-cache.ts` |
+| Code variations | `kebab-case.ts` (only when needed) | `image-cache.ts` |
 | Tests | `<source>.test.ts` | `cache.test.ts`, `cheer.test.ts` |
 | Module barrel | `mod.ts` | Always `mod.ts` |
 | CLI scripts | `lowercase.ts` | `show.ts`, `play.ts` |
@@ -89,7 +89,7 @@ deno test src/
 
 ## Cache Key Convention
 
-- Format: `"type:value"` — e.g., `"sound:hello.mp3"`, `"image:cat.png"`
+- Format: `"type:value"` — e.g., `"image:cat.png"`
 - Store prefix in module constant: `CACHE_PREFIX` or `CACHE_KEY`
 
 ## Cross-Cutting Patterns
