@@ -165,6 +165,7 @@ function updateSound(bytes: Uint8Array): void {
   const blob = new Blob([new Uint8Array(bytes)], { type: "audio/mpeg" });
   currentSoundUrl = URL.createObjectURL(blob);
   audioEl.src = currentSoundUrl;
+  app.querySelector<HTMLElement>(".sound-hint")!.hidden = true;
 }
 
 function playSound(): void {
