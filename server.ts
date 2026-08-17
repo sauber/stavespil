@@ -1,7 +1,33 @@
-import { fromFileUrl } from "jsr:@std/path@^1";
 import { join } from "jsr:@std/path@^1";
 
-const DIST = join(fromFileUrl(new URL("./", import.meta.url)), "dist");
+const DIST = join(Deno.cwd(), "dist");
+
+async function ensureDist(): Promise<void> {
+  try {
+    await Deno.stat(join(DIST, "index.html"));
+    return;
+  } catch {
+    // dist/ missing — try to build
+  }
+  console.log("dist/ not found — running vite build...");
+  try {
+    const cmd = new Deno.Command(Deno.execPath(), {
+      args: ["run", "-A", "npm:vite", "build"],
+      stdout: "inherit",
+      stderr: "inherit",
+    });
+    const status = await cmd.output();
+    if (!status.success) {
+      console.error("vite build failed");
+    } else {
+      console.log("Build complete.");
+    }
+  } catch (e) {
+    console.error("Could not run build:", e);
+  }
+}
+
+await ensureDist();
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
