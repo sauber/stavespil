@@ -6,6 +6,7 @@ body {
   padding: 1.5rem;
   max-width: 600px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 h1 {
   text-align: center;
@@ -285,13 +286,17 @@ h2 {
   flex-direction: column;
   align-items: center;
   gap: 0.35rem;
+  width: 100%;
 }
 .keyboard-row {
   display: flex;
   justify-content: center;
   gap: 0.35rem;
+  width: 100%;
 }
 .key {
+  flex: 0 1 2.8rem;
+  min-width: 0;
   width: 2.8rem;
   height: 2.8rem;
   border: none;
@@ -385,4 +390,9 @@ h2 {
 @keyframes confetti-fall {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@media (max-width: 480px) {
+  body {
+    padding: 0.75rem;
+  }
 }
