@@ -35,6 +35,6 @@ Deno.serve((req) => {
     return serveFile("round.html");
   }
 
-  const file = pathname === "/" ? "index.html" : pathname.slice(1);
+  const file = pathname === "/" ? "index.html" : decodeURIComponent(pathname).slice(1);
   return serveFile(file);
 });
