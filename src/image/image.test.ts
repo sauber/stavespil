@@ -1,8 +1,39 @@
-import { assertEquals, assert } from "@std/assert";
-import { getWordPicture } from "./image.ts";
+import { assertEquals, assert, assertStringIncludes } from "@std/assert";
+import { getWordPicture, generatePlaceholder } from "./image.ts";
 import { has, get as cacheGet, clear } from "../cache/mod.ts";
 
 const API_KEY = "56754611-2f3676f593072d805db4f2c97";
+
+Deno.test("generatePlaceholder returns a valid SVG data URL", () => {
+  const dataUrl = generatePlaceholder("kat");
+  assert(dataUrl.startsWith("data:image/svg+xml;base64,"));
+  const svg = atob(dataUrl.split(",")[1]);
+  assertStringIncludes(svg, "<svg");
+  assertStringIncludes(svg, "xmlns");
+});
+
+Deno.test("generatePlaceholder produces correct dot colors", () => {
+  const dataUrl = generatePlaceholder("hej");
+  const svg = atob(dataUrl.split(",")[1]);
+  assertStringIncludes(svg, "#e74c3c", "vowel 'e' should be red");
+  assertStringIncludes(svg, "#3498db", "consonant 'h' and 'j' should be blue");
+});
+
+Deno.test("generatePlaceholder produces one circle per letter", () => {
+  const dataUrl = generatePlaceholder("ab");
+  const svg = atob(dataUrl.split(",")[1]);
+  const circleCount = (svg.match(/<circle /g) ?? []).length;
+  assertEquals(circleCount, 2);
+});
+
+Deno.test("generatePlaceholder handles Danish special characters", () => {
+  const dataUrl = generatePlaceholder("æble");
+  const svg = atob(dataUrl.split(",")[1]);
+  assertStringIncludes(svg, "#e74c3c", "æ and e are vowels");
+  assertStringIncludes(svg, "#3498db", "b and l are consonants");
+  const circleCount = (svg.match(/<circle /g) ?? []).length;
+  assertEquals(circleCount, 4);
+});
 
 Deno.test({
   name: "getWordPicture returns a data URL with image data",
@@ -37,4 +68,16 @@ Deno.test({
   const second = await getWordPicture(API_KEY, "kat");
   assertEquals(second, first, "Cached result should match original");
   assert(has("image:kat"), "Cache should still contain 'image:kat'");
+});
+
+Deno.test({
+  name: "getWordPicture falls back to placeholder for unfindable word",
+  ignore: true,
+  permissions: { net: true },
+}, async () => {
+  clear();
+  const dataUrl = await getWordPicture(API_KEY, "xyzqwerty");
+  assert(dataUrl.startsWith("data:image/svg+xml;base64,"),
+    "Unfindable word should get SVG placeholder");
+  assert(has("image:xyzqwerty"), "Placeholder should be cached");
 });

@@ -26,7 +26,15 @@
   - Before level start: for each of 20 words, check cache → if miss, fetch from
     Pixabay → convert to Base64 → store in cache.
   - Level starts only when all 20 images are loaded.
-- **Fallback**: Show a placeholder image if API call fails.
+- **Retry cascade**: When the initial query returns zero results, progressively
+  relax search filters before giving up:
+  1. `image_type=illustration` + `lang=da` (full filter)
+  2. `lang=da` only (any image type)
+  3. No filters (just `q=word`)
+- **Placeholder fallback**: If all search steps return zero results, generate an
+  SVG placeholder image showing a row of colored dots — one per letter. Red dots
+  for vowels (`aeiouyæøå`), blue dots for consonants. The placeholder is cached
+  like any other image so subsequent rounds do not re-trigger API queries.
 - **Verbose mode**: Image downloader supports an optional verbose mode that
   prints number of images found, first image URL, byte size, and cache key.
 - **Attribution**: Display "Billeder fra Pixabay" in the game UI.

@@ -1,7 +1,7 @@
 /** Function that loads media for a word as raw bytes. */
 export type MediaLoader = (word: string) => Promise<Uint8Array>;
 
-export { getWordPicture, dataUrlToBytes } from "./image.ts";
+export { getWordPicture, dataUrlToBytes, generatePlaceholder } from "./image.ts";
 
 import { getWordPicture, dataUrlToBytes } from "./image.ts";
 

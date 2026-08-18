@@ -2,9 +2,11 @@
 /// <reference lib="dom.iterable" />
 import {
   buildPlayerStats,
+  clearProfile,
   getEarnedTrophyIds,
   loadProfile,
 } from "../player/mod.ts";
+import { clear as clearCache } from "../cache/cache.ts";
 import { getAllTrophies } from "../reward/mod.ts";
 import { loadWords } from "../words/load.ts";
 import type { WordGroups } from "../words/generate.ts";
@@ -272,6 +274,22 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
   return section;
 }
 
+function renderResetButton(): HTMLElement {
+  const btn = document.createElement("button");
+  btn.className = "reset-button";
+  btn.textContent = "Nulstil spil";
+  btn.addEventListener("click", () => {
+    const ok = window.confirm(
+      "Dette sletter al din fremgang, alle trofæer og alle downloadede billeder. Kan ikke fortrydes. Fortsæt?",
+    );
+    if (!ok) return;
+    clearProfile();
+    clearCache();
+    location.reload();
+  });
+  return btn;
+}
+
 async function render(): Promise<void> {
   const profile = loadProfile();
   const groups = await loadWords();
@@ -283,6 +301,7 @@ async function render(): Promise<void> {
   app.appendChild(renderProgression(profile));
   app.appendChild(renderTrophies(profile));
   app.appendChild(renderLevelSelection(groups));
+  app.appendChild(renderResetButton());
 
   document.body.appendChild(app);
 }

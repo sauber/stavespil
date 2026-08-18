@@ -124,6 +124,20 @@ h2 {
   font-size: 0.85rem;
   color: #777;
 }
+.reset-button {
+  display: block;
+  margin: 2rem auto 0;
+  background: none;
+  border: none;
+  color: #c0392b;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.reset-button:hover {
+  opacity: 1;
+}
 .stats-row {
   display: flex;
   gap: 1rem;
