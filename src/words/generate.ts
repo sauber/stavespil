@@ -66,25 +66,11 @@ function countSyllables(word: string): number {
   return Math.max(count, 1);
 }
 
-function phoneticComplexity(word: string): number {
+function danishPatternScore(word: string): number {
   const lower = word.toLowerCase();
   let score = 0;
-  if (lower.includes("æ")) score += 0.15;
-  if (lower.includes("ø")) score += 0.15;
-  if (lower.includes("å")) score += 0.15;
-  const skCount = (lower.match(/sk/g) || []).length;
-  score += Math.min(skCount * 0.08, 0.16);
-  const dcMatches = lower.match(/([bdfgklmnprst])\1/g) || [];
-  score += Math.min(dcMatches.length * 0.04, 0.2);
-  const silentDMatches = lower.match(/[aeiouyæøå]d/g) || [];
-  score += Math.min(silentDMatches.length * 0.03, 0.15);
-  if (lower.endsWith("dt") || lower.endsWith("gt")) score += 0.1;
-  return Math.min(score, 1);
-}
 
-function consonantClusterScore(word: string): number {
-  const lower = word.toLowerCase();
-  let score = 0;
+  // Consonant clusters (3+): 0.04 per extra consonant beyond 2
   let i = 0;
   while (i < lower.length) {
     if (!DANISH_VOWELS.has(lower[i])) {
@@ -93,11 +79,43 @@ function consonantClusterScore(word: string): number {
         clusterLen++;
         i++;
       }
-      if (clusterLen >= 2) score += clusterLen - 1;
+      if (clusterLen >= 3) score += 0.04 * (clusterLen - 2);
     } else {
       i++;
     }
   }
+
+  // Double consonants
+  const dcMatches = lower.match(/([bdfgklmnprst])\1/g) || [];
+  score += dcMatches.length * 0.08;
+
+  // Silent d: vowel + d before consonant or end-of-word
+  const silentDMatches = lower.match(/[aeiouyæøå]d(?=[bcdfghjklmnpqrstvwxz]|$)/g) || [];
+  score += silentDMatches.length * 0.10;
+
+  // Silent g: g between two vowels
+  const silentGMatches = lower.match(/[aeiouyæøå]g[aeiouyæøå]/g) || [];
+  score += silentGMatches.length * 0.10;
+
+  // Silent h: word-initial hj- or hv-
+  const silentHMatches = lower.match(/^(hj|hv)/g) || [];
+  score += silentHMatches.length * 0.08;
+
+  // -de ending
+  if (lower.endsWith("de")) score += 0.06;
+
+  // -ig ending
+  if (lower.endsWith("ig")) score += 0.06;
+
+  // r next to a vowel: count once per r
+  for (let j = 0; j < lower.length; j++) {
+    if (lower[j] === "r") {
+      const prevIsVowel = j > 0 && DANISH_VOWELS.has(lower[j - 1]);
+      const nextIsVowel = j < lower.length - 1 && DANISH_VOWELS.has(lower[j + 1]);
+      if (prevIsVowel || nextIsVowel) score += 0.04;
+    }
+  }
+
   return score;
 }
 
@@ -112,18 +130,14 @@ export function scoreWords(source: WordList): WordList {
     entry,
     length: entry.word.length,
     syllables: countSyllables(entry.word),
-    phonetic: phoneticComplexity(entry.word),
-    clusters: consonantClusterScore(entry.word),
+    patterns: danishPatternScore(entry.word),
   }));
 
   const lengthMin = Math.min(...rawScores.map((s) => s.length));
   const lengthMax = Math.max(...rawScores.map((s) => s.length));
   const syllableMin = Math.min(...rawScores.map((s) => s.syllables));
   const syllableMax = Math.max(...rawScores.map((s) => s.syllables));
-  const phoneticMin = Math.min(...rawScores.map((s) => s.phonetic));
-  const phoneticMax = Math.max(...rawScores.map((s) => s.phonetic));
-  const clusterMin = Math.min(...rawScores.map((s) => s.clusters));
-  const clusterMax = Math.max(...rawScores.map((s) => s.clusters));
+  const patternMax = Math.max(...rawScores.map((s) => s.patterns), 0.01);
   const freqLogMin = Math.log(Math.min(...source.map((w) => w.score)));
   const freqLogMax = Math.log(Math.max(...source.map((w) => w.score)));
 
@@ -131,14 +145,12 @@ export function scoreWords(source: WordList): WordList {
     const lenNorm = normalize(s.length, lengthMin, lengthMax);
     const freqNorm = 1 - normalize(Math.log(s.entry.score), freqLogMin, freqLogMax);
     const syllNorm = normalize(s.syllables, syllableMin, syllableMax);
-    const phonNorm = normalize(s.phonetic, phoneticMin, phoneticMax);
-    const clustNorm = normalize(s.clusters, clusterMin, clusterMax);
+    const patNorm = s.patterns / patternMax;
     const totalScore =
-      0.30 * lenNorm +
+      0.25 * lenNorm +
       0.25 * freqNorm +
       0.20 * syllNorm +
-      0.15 * phonNorm +
-      0.10 * clustNorm;
+      0.30 * patNorm;
     return { type: s.entry.type, word: s.entry.word, score: totalScore };
   });
 
