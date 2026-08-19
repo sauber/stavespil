@@ -9,3 +9,4 @@ TODO list
 - Onscreen keyboard key remains green from previous word into new word.
 - Remove duplication in .env file
 - Only one trophy unlocked per round
+- Deno check env error

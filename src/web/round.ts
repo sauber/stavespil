@@ -121,6 +121,14 @@ function createApp(): void {
   keydownHandler = (e: KeyboardEvent) => {
     if (completed) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === " ") {
+      e.preventDefault();
+      if (audioEl.src) {
+        audioEl.currentTime = 0;
+        audioEl.play().catch(() => {});
+      }
+      return;
+    }
     const ch = e.key.toLowerCase();
     if (ch.length === 1 && letterSet.has(ch)) {
       e.preventDefault();
