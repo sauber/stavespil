@@ -58,8 +58,8 @@ function renderProgression(
   const rangeX = maxX - minX || 1;
 
   const padY = 4;
-  const minDiff = Math.max(1, Math.min(...entries.map((e) => e.difficulty)) - padY);
-  const maxDiff = Math.min(100, Math.max(...entries.map((e) => e.difficulty)) + padY);
+  const minDiff = Math.max(1, Math.min(...entries.map((e) => e.newRank)) - padY);
+  const maxDiff = Math.min(100, Math.max(...entries.map((e) => e.newRank)) + padY);
   const rangeDiff = maxDiff - minDiff || 1;
 
   function x(ts: number): number {
@@ -113,7 +113,7 @@ function renderProgression(
     "transform",
     `rotate(-90, 8, ${padT + h / 2})`,
   );
-  yLabel.textContent = "Sværhedsgrad";
+  yLabel.textContent = "Niveau";
   svg.appendChild(yLabel);
 
   // x-axis date labels — skip any that would overlap
@@ -151,7 +151,7 @@ function renderProgression(
 
   // line path
   const d = entries
-    .map((e, i) => `${i === 0 ? "M" : "L"}${x(e.timestamp).toFixed(1)},${y(e.difficulty).toFixed(1)}`)
+    .map((e, i) => `${i === 0 ? "M" : "L"}${x(e.timestamp).toFixed(1)},${y(e.newRank).toFixed(1)}`)
     .join(" ");
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d);
@@ -168,7 +168,7 @@ function renderProgression(
       "circle",
     );
     circle.setAttribute("cx", String(x(e.timestamp)));
-    circle.setAttribute("cy", String(y(e.difficulty)));
+    circle.setAttribute("cy", String(y(e.newRank)));
     circle.setAttribute("r", "3.5");
     circle.setAttribute("fill", "#5BA8DE");
     svg.appendChild(circle);
