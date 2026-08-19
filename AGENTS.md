@@ -23,3 +23,7 @@ and design choices, and an optional `TODO.md` for known issues.
 | `src/spell/`  | Core game engine (rounds, scoring) |
 | `src/web/`    | Web frontend (UI rendering)        |
 | `src/words/`  | Word database generation           |
+
+## Build
+
+Skip `deno task build` — it is not needed for development.
