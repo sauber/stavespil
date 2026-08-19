@@ -15,6 +15,7 @@ import { checkTrophies } from "../reward/mod.ts";
 import type { Trophy } from "../reward/mod.ts";
 
 const DANISH_LETTERS = [..."abcdefghijklmnopqrstuvwxyzæøå"];
+const VOWELS = new Set("aeiouyæøå");
 const KEYBOARD_ROWS = [
   [..."qwertyuiopå"],
   [..."asdfghjklæø"],
@@ -187,10 +188,12 @@ function renderFrames(state: EngineState): void {
   framesEl.innerHTML = "";
   const currentPos = state.frames.filter((f) => f !== null).length;
   const isError = state.wordErrors > frameErrorSeen;
+  const word = state.word;
   for (let i = 0; i < state.frames.length; i++) {
     const frame = state.frames[i];
     const div = document.createElement("div");
     let cls = `letter-frame ${frame ? "filled" : "empty"}`;
+    if (VOWELS.has(word[i])) cls += " vowel";
     if (!frame && isError && i === currentPos) {
       cls += " wrong";
     }

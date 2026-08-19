@@ -263,6 +263,13 @@ h2 {
   color: #333;
   animation: pop-in 0.25s ease;
 }
+.letter-frame.empty.vowel {
+  border-color: #FFB3B3;
+}
+.letter-frame.filled.vowel {
+  border-color: #F58B8B;
+  background: #FFB3B3;
+}
 .letter-frame.wrong {
   animation: shake 0.35s ease;
 }

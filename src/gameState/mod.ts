@@ -84,4 +84,6 @@ export type EngineState = {
   totalErrors: number;
   /** Unique letters in the current word (for keyboard rendering) */
   wordLetters: string[];
+  /** The current word being spelled */
+  word: string;
 };

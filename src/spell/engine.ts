@@ -68,6 +68,7 @@ export function createEngine(
       wordErrors: state.wordErrors,
       totalErrors: state.totalErrors,
       wordLetters: uniqueLetters(word),
+      word,
     };
   }
 
