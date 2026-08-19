@@ -158,6 +158,12 @@ h2 {
   text-decoration: none;
   font-size: 0.9rem;
 }
+.round-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
 .back-link:hover {
   color: #222;
 }
@@ -220,6 +226,7 @@ h2 {
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
   transition: transform 0.15s;
+  touch-action: manipulation;
 }
 .sound-button:hover {
   transform: scale(1.1);
@@ -329,6 +336,7 @@ h2 {
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  touch-action: manipulation;
 }
 .key:hover {
   background: #B8F0C8;
@@ -412,8 +420,71 @@ h2 {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
+.round-game {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
 @media (max-width: 480px) {
   body {
     padding: 0.75rem;
+  }
+  .round-game {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+  .round-game .round-top {
+    margin-bottom: 0.25rem;
+  }
+  .round-game h1 {
+    font-size: 1.2rem;
+  }
+  .round-game .back-link {
+    font-size: 0.75rem;
+  }
+  .round-game .round-header {
+    font-size: 0.85rem;
+    padding: 0.25rem 0;
+    margin-bottom: 0.25rem;
+  }
+  .round-game .word-area {
+    flex: 1;
+    min-height: 0;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    justify-content: center;
+  }
+  .round-game .image-frame {
+    max-width: 180px;
+  }
+  .round-game .letter-frame {
+    width: 2.2rem;
+    height: 2.5rem;
+    font-size: 1.1rem;
+    border-width: 2px;
+  }
+  .round-game .letter-frames {
+    gap: 0.3rem;
+  }
+  .round-game .cheer-bubble {
+    min-height: 1.5rem;
+    font-size: 0.85rem;
+  }
+  .round-game .keyboard {
+    flex-shrink: 0;
+    gap: 0.25rem;
+  }
+  .round-game .keyboard-row {
+    gap: 0.25rem;
+  }
+  .round-game .key {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 0.85rem;
   }
 }
