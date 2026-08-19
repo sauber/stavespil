@@ -111,7 +111,10 @@ function createApp(): void {
         round.enterLetter(letter);
         key.blur();
       });
-      key.addEventListener("mouseup", () => key.classList.remove("pressed"));
+      const clear = () => key.classList.remove("pressed");
+      key.addEventListener("pointerup", clear);
+      key.addEventListener("pointerleave", clear);
+      key.addEventListener("pointercancel", clear);
       rowEl.appendChild(key);
     }
     keyboard.appendChild(rowEl);
@@ -254,6 +257,7 @@ function handleDimming(state: EngineState): void {
 function handleState(state: EngineState): void {
   if (state.wordIndex !== lastWordIndex) {
     lastWordIndex = state.wordIndex;
+    clearPressedKeys();
     prevWordErrors = 0;
     frameErrorSeen = 0;
     activeLetters = new Set(DANISH_LETTERS);
@@ -340,6 +344,7 @@ function renderResult(result: RoundResult, newRank: number, trophies: Trophy[]):
 function completeRound(): void {
   if (completed) return;
   completed = true;
+  clearPressedKeys();
 
   if (keydownHandler) {
     document.removeEventListener("keydown", keydownHandler);
