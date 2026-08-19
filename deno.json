@@ -3,6 +3,7 @@
     "@cross/image": "jsr:@cross/image@^0.4.3",
     "@sauber/block-image": "jsr:@sauber/block-image@^2.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/path": "jsr:@std/path@^1",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.31",
     "vite": "npm:vite@^8.1.5",
     "ws": "npm:ws@^8.18.0"

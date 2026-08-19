@@ -279,7 +279,7 @@ function renderResetButton(): HTMLElement {
   btn.className = "reset-button";
   btn.textContent = "Nulstil spil";
   btn.addEventListener("click", () => {
-    const ok = window.confirm(
+    const ok = globalThis.confirm(
       "Dette sletter al din fremgang, alle trofæer og alle downloadede billeder. Kan ikke fortrydes. Fortsæt?",
     );
     if (!ok) return;

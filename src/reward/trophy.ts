@@ -138,6 +138,7 @@ export function checkTrophies(
         emoji: def.emoji,
         description: def.description,
       });
+      break;
     }
   }
 
