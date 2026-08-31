@@ -92,8 +92,8 @@ Inline feedback bubbles appear during gameplay after each letter input.
 ### Trophies
 
 Persistent achievements earned once when a condition is met. Checked after each
-round completion. Newly unlocked trophies trigger a celebration screen with
-confetti for 3 seconds.
+round completion. At most one trophy is released per round. A newly unlocked
+trophy triggers a celebration screen with confetti for 3 seconds.
 
 | Emoji | ID | Condition |
 |-------|----|-----------|
@@ -115,13 +115,13 @@ Locked trophies appear in grayscale with a lock icon and hidden title.
 
 ## Word Database
 
-- Source: DSL corpus (`ordbanken/da/`) — the most frequent Danish words.
+- Source: DSL corpus (`korpus.dsl.dk`) — the most frequent Danish words.
 - Words are distributed into **100 difficulty levels** with equal word counts.
 - Difficulty is scored based on:
-  - Word length (30%)
+  - Word length (25%)
   - Frequency in language (25%)
   - Number of syllables (20%)
-  - Consonant ratio (25%)
+  - Danish phonological patterns (30%)
 
 ## Menu Screen
 

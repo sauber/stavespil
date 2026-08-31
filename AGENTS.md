@@ -16,6 +16,7 @@ and design choices, and an optional `TODO.md` for known issues.
 | Module        | Purpose                            |
 | ------------- | ---------------------------------- |
 | `src/cache/`  | LRU media cache (localStorage)     |
+| `src/cli/`    | Terminal interaction helpers       |
 | `src/image/`  | Image fetching (Pixabay API)       |
 | `src/player/` | Player profile and rank management |
 | `src/reward/` | Cheers and trophies                |

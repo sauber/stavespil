@@ -35,6 +35,7 @@
 - 12 persistent achievements.
 - Each trophy earned only once (first time condition is met).
 - Checked after each round completion.
+- At most one trophy released per round.
 - Return newly unlocked trophies (empty array if none).
 - Celebration screen with confetti when a trophy is unlocked (3 seconds).
 - Trophy collection displayed on menu screen as a grid of cards.
@@ -115,6 +116,7 @@ type Trophy = {
 ```
 
 - **Function**: `checkTrophies(result: RoundResult, stats: PlayerStats, earnedIds: string[]): Trophy[]`
-- Evaluates all trophy conditions, returns only newly unlocked trophies.
+- Checks trophy conditions in definition order and returns at most **one**
+  newly unlocked trophy per round (stops at the first matching condition).
 - Trophy definitions stored as a hardcoded array of `{ id, title, emoji, description, condition }`.
 - No localStorage access — player module handles storage.

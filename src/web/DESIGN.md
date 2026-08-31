@@ -28,7 +28,7 @@ change, and any newly unlocked trophies.
 | Vite | Dev server and bundler (serves native ES modules) |
 | Deno | Runtime (runs Vite, manages deps) |
 | Tailwind CSS | Utility-first styling (v4, CSS-first config) |
-| Chart.js | Rank history line chart |
+| SVG (hand-drawn) | Rank history line chart |
 
 ## Client-Side Data Architecture
 
@@ -139,7 +139,7 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 ### Rank Display
 
 - Current (most recent) rank shown prominently.
-- Line chart of rank history over time (recharts).
+- Line chart of rank history over time (hand-drawn SVG).
 
 ### Level Selection
 

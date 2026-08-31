@@ -194,6 +194,7 @@ type EngineState = {
   wordErrors: number;          // errors on current word
   totalErrors: number;         // cumulative errors across round
   wordLetters: string[];       // unique letters in current word (for keyboard)
+  word: string;                // the current word being spelled
 };
 ```
 
@@ -262,6 +263,7 @@ type Round = {
   nextWord(): void;
   isComplete(): boolean;
   getResult(): RoundResult;
+  getWords(): string[];
 };
 
 async function createRound(config: RoundConfig): Promise<Round>;
@@ -269,7 +271,7 @@ async function createRound(config: RoundConfig): Promise<Round>;
 
 **`createRound` algorithm:**
 
-1. Load word groups via `retrieveWords()` from `src/words/`
+1. Load word groups via `loadWords()` from `src/words/load.ts`
 2. Select 20 words:
    - `difficulty - 1` (clamped 0–99): pick 5 words
    - `difficulty` (clamped 0–99): pick 10 words
@@ -305,6 +307,8 @@ function calculateTimeScore(wordResults: WordResult[], difficulty: number): numb
 function calculateCombinedScore(errorScore: number, timeScore: number): number;
 function calculateRankChange(score: number): -1 | 0 | 1;
 function calculateTotalTime(wordResults: WordResult[]): number;
+function calculateMaxStreak(wordResults: WordResult[]): number;
+function computeScore(wordResults: WordResult[], difficulty: number): ScoreResult;
 ```
 
 ### External Dependencies
@@ -312,7 +316,7 @@ function calculateTotalTime(wordResults: WordResult[]): number;
 | Dependency | Used By | How |
 |------------|---------|-----|
 | `src/reward/mod.ts` | `engine.ts` | `onLetterInput()` for cheer messages, `resetLevel()` at round start |
-| `src/words/mod.ts` | `round.ts` | `retrieveWords()` to load word groups |
+| `src/words/load.ts` | `round.ts` | `loadWords()` to load word groups |
 | `src/image/mod.ts` | caller | Provides `imageLoader` via config |
 | `src/sound/mod.ts` | caller | Provides sound loading via config |
 

@@ -15,6 +15,7 @@ Technical foundations, coding conventions, and project structure for StaveSpil.
 ```
 src/
 ├── cache/      — LRU media cache (localStorage)
+├── cli/        — Terminal interaction helpers (display, input)
 ├── gameState/  — Shared types used across modules
 ├── image/      — Image fetching (Pixabay API)
 ├── player/     — Player profile and rank management
@@ -35,6 +36,8 @@ src/<module>/
 ├── DESIGN.md       — Requirements and design for this module only
 └── TODO.md         — Known issues (optional)
 ```
+
+Types-only modules (e.g. `gameState/`) may contain only `mod.ts`.
 
 ## Code Conventions
 
