@@ -158,6 +158,22 @@ Deno.test("extract skips malformed lines", async () => {
   assertEquals(result.length, 2);
 });
 
+Deno.test("extract strips diacritics so words use only Danish letters", async () => {
+  const tsv = "NC\tidé\t0.5\nNC\tcafé\t0.3\nA\tgå\t0.1\nA\tpå\t0.2\n";
+  const zip = await createZip("freq-30k-ex.txt", tsv);
+  const result = await extract(zip);
+  assertEquals(result.map((w) => w.word), ["ide", "cafe", "gå", "på"]);
+});
+
+Deno.test("dedupe after extract keeps most frequent of accented collision", async () => {
+  const tsv = "NC\tidé\t0.7\nNC\tide\t0.2\nNC\tcafe\t0.5\n";
+  const zip = await createZip("freq-30k-ex.txt", tsv);
+  const extracted = await extract(zip);
+  const result = limitWords(extracted, 10);
+  assertEquals(result.length, 2);
+  assertEquals(result.find((w) => w.word === "ide")!.score, 0.7);
+});
+
 Deno.test({
   name: "download returns zip data that can be extracted",
   ignore: true,

@@ -17,6 +17,14 @@ columns on each line.
 
 Use top 2000 most frequently used words having at least two chars.
 
+## Normalization
+
+Accented diacritics (e.g. `idé` → `ide`, `café` → `cafe`) are stripped when
+extracting words, so the database only contains the Danish alphabet
+`a–z` plus `æ, ø, å` (matching the on-screen keyboard). The `å` ring is
+preserved. Words that collide after stripping (e.g. `idé` and `ide`) are
+deduplicated, keeping the most frequent form.
+
 ## Difficulty Scoring
 
 Word difficulty is calculated by four factors with these weights:

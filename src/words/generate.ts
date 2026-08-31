@@ -5,6 +5,20 @@ export async function download(): Promise<Uint8Array> {
   return new Uint8Array(await response.arrayBuffer());
 }
 
+// Strip diacritics (é → e) so words only use the Danish alphabet a–z + æ, ø, å.
+// The combining ring (U+030A) is kept so å keeps its dot, then recomposed via NFC.
+function stripDiacritics(word: string): string {
+  return word
+    .normalize("NFD")
+    .split("")
+    .filter((ch) => {
+      const code = ch.codePointAt(0)!;
+      return !(code >= 0x0300 && code <= 0x036f && code !== 0x030a);
+    })
+    .join("")
+    .normalize("NFC");
+}
+
 // Extract words from file in zip archive
 type WordEntry = {
   type: string;
@@ -27,7 +41,7 @@ export async function extract(file: Uint8Array): Promise<WordList> {
     const parts = line.split("\t");
     if (parts.length >= 3) {
       const type = parts[0].trim();
-      const word = parts[1].trim();
+      const word = stripDiacritics(parts[1].trim());
       const score = parseFloat(parts[2].trim());
       if (!isNaN(score) && word.length > 0) {
         result.push({ type, word, score });
@@ -188,7 +202,7 @@ export async function storeWords(groups: WordGroups, key?: string): Promise<void
     localStorage.setItem(key, JSON.stringify(groups));
     return;
   }
-  await Deno.writeTextFile(DEFAULT_PATH, JSON.stringify(groups));
+  await Deno.writeTextFile(DEFAULT_PATH, JSON.stringify(groups, null, 2) + "\n");
 }
 
 // Load words from localStorage (used by tests with custom keys)
