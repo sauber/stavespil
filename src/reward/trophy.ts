@@ -12,12 +12,6 @@ export type Trophy = {
   description: string;
 };
 
-/** Stored representation of an earned trophy. */
-export type StoredTrophy = {
-  id: string;
-  unlockedAt: number;
-};
-
 const TROPHY_DEFINITIONS: Array<Trophy & {
   condition: (
     result: RoundResult,

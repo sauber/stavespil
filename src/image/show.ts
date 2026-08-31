@@ -1,20 +1,6 @@
 import { has, remove } from "../cache/mod.ts";
-import { imageLoader } from "./mod.ts";
+import { imageLoader, loadApiKey, CACHE_PREFIX } from "./mod.ts";
 import { printLine, showImage } from "../cli/mod.ts";
-
-const CACHE_PREFIX = "image:";
-
-/**
- * Load PIXABAY_API_KEY from the project root .env file.
- */
-async function loadApiKey(): Promise<string> {
-  const text = await Deno.readTextFile(".env");
-  const match = text.match(/^PIXABAY_API_KEY=(.+)$/m);
-  if (!match) {
-    throw new Error("PIXABAY_API_KEY not found in .env");
-  }
-  return match[1].trim();
-}
 
 /**
  * CLI tool and end-to-end integrity test for word picture display.

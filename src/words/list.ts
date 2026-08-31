@@ -1,8 +1,5 @@
 import { existsWords, retrieveWords, type WordGroups } from "./generate.ts";
-
-// Shuffle array of strings
-const shuffle = (words: Array<string>) =>
-  words.sort((_) => Math.random() - 0.5);
+import { shuffle } from "../gameState/mod.ts";
 
 // Confirm word list retrieved
 const generated: boolean = await existsWords();

@@ -2,6 +2,7 @@ import { loadWords } from "../words/load.ts";
 import type { WordGroups } from "../words/generate.ts";
 import { createEngine } from "./engine.ts";
 import { computeScore, calculateMaxStreak } from "./score.ts";
+import { shuffle } from "../gameState/mod.ts";
 import type {
   EngineState,
   Media,
@@ -58,8 +59,7 @@ export function selectWords(groups: WordGroups, difficulty: number): string[] {
 
   const pick = (group: string[], count: number): string[] => {
     const available = group.filter((word) => !used.has(word));
-    const shuffled = [...available].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, count);
+    const picked = shuffle(available).slice(0, count);
     for (const word of picked) used.add(word);
     return picked;
   };
@@ -71,18 +71,6 @@ export function selectWords(groups: WordGroups, difficulty: number): string[] {
   ];
 
   return shuffle(words);
-}
-
-/**
- * Fisher-Yates shuffle.
- */
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 /**

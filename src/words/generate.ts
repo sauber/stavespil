@@ -1,4 +1,6 @@
 // Download words from https://korpus.dsl.dk/download/freq-lemma.zip
+import { VOWELS } from "../gameState/mod.ts";
+
 export async function download(): Promise<Uint8Array> {
   const response = await fetch("https://korpus.dsl.dk/download/freq-lemma.zip");
   if (!response.ok) throw new Error(`Download failed: ${response.status}`);
@@ -66,14 +68,12 @@ export function limitWords(source: WordList, count: number): WordList {
     .slice(0, count);
 }
 
-const DANISH_VOWELS = new Set("aeiouyæøå");
-
 function countSyllables(word: string): number {
   const lower = word.toLowerCase();
   let count = 0;
   let prevWasVowel = false;
   for (const ch of lower) {
-    const isVowel = DANISH_VOWELS.has(ch);
+    const isVowel = VOWELS.has(ch);
     if (isVowel && !prevWasVowel) count++;
     prevWasVowel = isVowel;
   }
@@ -87,9 +87,9 @@ function danishPatternScore(word: string): number {
   // Consonant clusters (3+): 0.04 per extra consonant beyond 2
   let i = 0;
   while (i < lower.length) {
-    if (!DANISH_VOWELS.has(lower[i])) {
+    if (!VOWELS.has(lower[i])) {
       let clusterLen = 0;
-      while (i < lower.length && !DANISH_VOWELS.has(lower[i])) {
+      while (i < lower.length && !VOWELS.has(lower[i])) {
         clusterLen++;
         i++;
       }
@@ -124,8 +124,8 @@ function danishPatternScore(word: string): number {
   // r next to a vowel: count once per r
   for (let j = 0; j < lower.length; j++) {
     if (lower[j] === "r") {
-      const prevIsVowel = j > 0 && DANISH_VOWELS.has(lower[j - 1]);
-      const nextIsVowel = j < lower.length - 1 && DANISH_VOWELS.has(lower[j + 1]);
+      const prevIsVowel = j > 0 && VOWELS.has(lower[j - 1]);
+      const nextIsVowel = j < lower.length - 1 && VOWELS.has(lower[j + 1]);
       if (prevIsVowel || nextIsVowel) score += 0.04;
     }
   }

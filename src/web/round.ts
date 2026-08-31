@@ -4,6 +4,7 @@ import { createRound } from "../spell/mod.ts";
 import type { EngineState, Round, RoundResult } from "../spell/mod.ts";
 import { imageLoader } from "../image/mod.ts";
 import { staticSoundLoader } from "../sound/mod.ts";
+import { shuffle, VOWELS } from "../gameState/mod.ts";
 import {
   buildPlayerStats,
   calculateNewRank,
@@ -15,7 +16,6 @@ import { checkTrophies } from "../reward/mod.ts";
 import type { Trophy } from "../reward/mod.ts";
 
 const DANISH_LETTERS = [..."abcdefghijklmnopqrstuvwxyzæøå"];
-const VOWELS = new Set("aeiouyæøå");
 const KEYBOARD_ROWS = [
   [..."qwertyuiopå"],
   [..."asdfghjklæø"],
@@ -45,15 +45,6 @@ let audioEl: HTMLAudioElement;
 let completed = false;
 let frameErrorSeen = 0;
 let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
-
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 
 function flashKey(letter: string): HTMLElement | null {
   const key = app?.querySelector<HTMLElement>(`.key[data-letter="${letter}"]`);

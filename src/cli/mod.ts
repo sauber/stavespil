@@ -1,6 +1,5 @@
 export {
   flashWrong,
-  initSlots,
   printLine,
   renderSlots,
   showImage,

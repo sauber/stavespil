@@ -1,9 +1,23 @@
-/** Function that loads media for a word as raw bytes. */
-export type MediaLoader = (word: string) => Promise<Uint8Array>;
+import type { MediaLoader } from "../gameState/mod.ts";
+import { CACHE_PREFIX } from "./image.ts";
 
+export type { MediaLoader };
+export { CACHE_PREFIX };
 export { getWordPicture, dataUrlToBytes, generatePlaceholder } from "./image.ts";
 
 import { getWordPicture, dataUrlToBytes } from "./image.ts";
+
+/**
+ * Load PIXABAY_API_KEY from the project root .env file.
+ */
+export async function loadApiKey(): Promise<string> {
+  const text = await Deno.readTextFile(".env");
+  const match = text.match(/^PIXABAY_API_KEY=(.+)$/m);
+  if (!match) {
+    throw new Error("PIXABAY_API_KEY not found in .env");
+  }
+  return match[1].trim();
+}
 
 /**
  * Create an image loader function bound to a Pixabay API key.

@@ -1,11 +1,12 @@
 import type {
   Cheer,
   EngineState,
+  MediaLoader,
   PlayerStats,
   RoundResult,
 } from "../gameState/mod.ts";
 
-export type { Cheer, EngineState, PlayerStats, RoundResult };
+export type { Cheer, EngineState, MediaLoader, PlayerStats, RoundResult };
 
 /** Result of a single word within a round. */
 export type WordResult = {
@@ -43,6 +44,3 @@ export type Media = {
 
 /** Callback signature for engine state updates. */
 export type OnStateChange = (state: EngineState) => void;
-
-/** Function that loads media for a word. */
-export type MediaLoader = (word: string) => Promise<Uint8Array>;

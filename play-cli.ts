@@ -2,7 +2,7 @@ import { ensureWords } from "./src/words/mod.ts";
 import { calculateNewRank, loadProfile, saveProfile } from "./src/player/mod.ts";
 import { createRound } from "./src/spell/mod.ts";
 import type { EngineState, MediaLoader } from "./src/spell/mod.ts";
-import { imageLoader } from "./src/image/mod.ts";
+import { imageLoader, loadApiKey } from "./src/image/mod.ts";
 import {
   flashWrong,
   printLine,
@@ -11,13 +11,6 @@ import {
   showImageBytes,
 } from "./src/cli/mod.ts";
 import { onInterrupt, readKey } from "./src/cli/mod.ts";
-
-async function loadApiKey(): Promise<string> {
-  const text = await Deno.readTextFile(".env");
-  const match = text.match(/^PIXABAY_API_KEY=(.+)$/m);
-  if (!match) throw new Error("PIXABAY_API_KEY not found in .env");
-  return match[1].trim();
-}
 
 await ensureWords();
 const profile = loadProfile();

@@ -4,33 +4,14 @@ import type { WordResult, ScoreResult } from "./types.ts";
  * Calculate error rate score from total errors across 20 words.
  *
  * Scoring: 0 errors → 100, 1 → 80, 2 → 60, 3 → 40, ≥4 → 20.
- * Linear interpolation between breakpoints.
  *
  * @param totalErrors - Sum of wrong letters across all words
  * @returns Error score (0–100)
  */
 export function calculateErrorScore(totalErrors: number): number {
-  const breakpoints = [
-    { errors: 0, score: 100 },
-    { errors: 1, score: 80 },
-    { errors: 2, score: 60 },
-    { errors: 3, score: 40 },
-    { errors: 4, score: 20 },
-  ];
-
   if (totalErrors <= 0) return 100;
   if (totalErrors >= 4) return 20;
-
-  for (let i = 0; i < breakpoints.length - 1; i++) {
-    const low = breakpoints[i];
-    const high = breakpoints[i + 1];
-    if (totalErrors >= low.errors && totalErrors <= high.errors) {
-      const t = (totalErrors - low.errors) / (high.errors - low.errors);
-      return Math.round(low.score + t * (high.score - low.score));
-    }
-  }
-
-  return 20;
+  return 100 - totalErrors * 20;
 }
 
 /**

@@ -1,5 +1,6 @@
-/** Function that loads media for a word as raw bytes. */
-export type MediaLoader = (word: string) => Promise<Uint8Array>;
+import type { MediaLoader } from "../gameState/mod.ts";
+
+export type { MediaLoader };
 
 /** URL-relative path to the pre-generated MP3 file for a word. */
 export function soundPath(word: string): string {

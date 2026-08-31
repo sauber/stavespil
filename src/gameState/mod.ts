@@ -60,6 +60,24 @@ export type PlayerStats = {
   currentRank: number;
 };
 
+/** Function that loads media for a word as raw bytes. */
+export type MediaLoader = (word: string) => Promise<Uint8Array>;
+
+/** Danish vowels used for syllable counting and image placeholders. */
+export const VOWELS = new Set("aeiouyæøå");
+
+/**
+ * Fisher-Yates shuffle. Returns a new shuffled copy of the input array.
+ */
+export function shuffle<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 /** Complete state snapshot pushed to renderer on every change. */
 export type EngineState = {
   /** Index of the current word (0–19) */

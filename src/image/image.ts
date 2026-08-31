@@ -1,8 +1,7 @@
 import { has, get, set } from "../cache/mod.ts";
+import { VOWELS } from "../gameState/mod.ts";
 
-const CACHE_PREFIX = "image:";
-
-const VOWELS = new Set("aeiouyæøå");
+export const CACHE_PREFIX = "image:";
 
 type SearchStep = {
   imageType?: string;

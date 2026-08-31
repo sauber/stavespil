@@ -172,11 +172,6 @@ export function printLine(text: string): void {
   console.log(text);
 }
 
-/** Create an array of underscore slots. */
-export function initSlots(count: number): string[] {
-  return Array(count).fill(MASK);
-}
-
 /** Overwrite the current terminal line with the slot contents. */
 export function renderSlots(slots: string[]): void {
   Deno.stdout.writeSync(
