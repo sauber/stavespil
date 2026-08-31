@@ -1,14 +1,14 @@
 import { assertEquals, assert, assertRejects, assertThrows } from "@std/assert";
 import { createRound, selectWords } from "./round.ts";
 import type { EngineState, MediaLoader } from "./types.ts";
-import type { WordList, WordGroups } from "../words/generate.ts";
+import type { WordGroups } from "../words/generate.ts";
 
 function makeGroups(): WordGroups {
-  const groups: WordList[] = [];
+  const groups: WordGroups = [];
   for (let i = 0; i < 100; i++) {
-    const words: WordList = [];
+    const words: string[] = [];
     for (let j = 0; j < 20; j++) {
-      words.push({ type: "noun", word: `ord${i}_${j}`, score: 0.5 });
+      words.push(`ord${i}_${j}`);
     }
     groups.push(words);
   }
@@ -53,7 +53,7 @@ Deno.test("selectWords picks 20 words total", () => {
 Deno.test("selectWords picks 10 from chosen level", () => {
   const groups = makeGroups();
   const words = selectWords(groups, 5);
-  const levelWords = groups[4].map((e) => e.word);
+  const levelWords = groups[4];
   const fromLevel = words.filter((w) => levelWords.includes(w));
   assertEquals(fromLevel.length, 10);
 });
@@ -61,7 +61,7 @@ Deno.test("selectWords picks 10 from chosen level", () => {
 Deno.test("selectWords picks 5 from level below", () => {
   const groups = makeGroups();
   const words = selectWords(groups, 5);
-  const belowWords = groups[3].map((e) => e.word);
+  const belowWords = groups[3];
   const fromBelow = words.filter((w) => belowWords.includes(w));
   assertEquals(fromBelow.length, 5);
 });
@@ -69,7 +69,7 @@ Deno.test("selectWords picks 5 from level below", () => {
 Deno.test("selectWords picks 5 from level above", () => {
   const groups = makeGroups();
   const words = selectWords(groups, 5);
-  const aboveWords = groups[5].map((e) => e.word);
+  const aboveWords = groups[5];
   const fromAbove = words.filter((w) => aboveWords.includes(w));
   assertEquals(fromAbove.length, 5);
 });
@@ -78,8 +78,8 @@ Deno.test("selectWords clamps difficulty=1 so below equals level", () => {
   const groups = makeGroups();
   const words = selectWords(groups, 1);
   assertEquals(words.length, 20);
-  const levelWords = groups[0].map((e) => e.word);
-  const aboveWords = groups[1].map((e) => e.word);
+  const levelWords = groups[0];
+  const aboveWords = groups[1];
   const fromLevelOrBelow = words.filter((w) => levelWords.includes(w));
   const fromAbove = words.filter((w) => aboveWords.includes(w));
   assertEquals(fromLevelOrBelow.length, 15);
@@ -90,8 +90,8 @@ Deno.test("selectWords clamps difficulty=100 so above equals level", () => {
   const groups = makeGroups();
   const words = selectWords(groups, 100);
   assertEquals(words.length, 20);
-  const levelWords = groups[99].map((e) => e.word);
-  const belowWords = groups[98].map((e) => e.word);
+  const levelWords = groups[99];
+  const belowWords = groups[98];
   const fromLevelOrAbove = words.filter((w) => levelWords.includes(w));
   const fromBelow = words.filter((w) => belowWords.includes(w));
   assertEquals(fromLevelOrAbove.length, 15);

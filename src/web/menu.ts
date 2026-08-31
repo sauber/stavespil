@@ -256,7 +256,6 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
       ? [...groups[level]]
         .sort(() => Math.random() - 0.5)
         .slice(0, 3)
-        .map((w) => w.word)
         .join(", ")
       : "...";
 

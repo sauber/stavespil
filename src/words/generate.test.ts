@@ -87,10 +87,10 @@ Deno.test("wordGroups preserves word order across groups", () => {
   }));
   const groups = wordGroups(words);
   assertEquals(groups.length, 3);
-  assertEquals(groups[0][0].word, "w0");
-  assertEquals(groups[0][19].word, "w19");
-  assertEquals(groups[1][0].word, "w20");
-  assertEquals(groups[2][0].word, "w40");
+  assertEquals(groups[0][0], "w0");
+  assertEquals(groups[0][19], "w19");
+  assertEquals(groups[1][0], "w20");
+  assertEquals(groups[2][0], "w40");
 });
 
 Deno.test("wordGroups returns empty array for empty input", () => {
@@ -193,8 +193,8 @@ Deno.test("existsWords returns false when no cache", async () => {
 
 Deno.test("storeWords and retrieveWords round-trip", async () => {
   const groups = [
-    [{ type: "NC", word: "kat", score: 0.5 }],
-    [{ type: "A", word: "stor", score: 0.3 }],
+    ["kat"],
+    ["stor"],
   ];
   await storeWords(groups, "wordList-test");
   const retrieved = retrieveWords("wordList-test");

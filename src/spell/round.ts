@@ -1,5 +1,5 @@
 import { loadWords } from "../words/load.ts";
-import type { WordList } from "../words/generate.ts";
+import type { WordGroups } from "../words/generate.ts";
 import { createEngine } from "./engine.ts";
 import { computeScore, calculateMaxStreak } from "./score.ts";
 import type {
@@ -49,17 +49,17 @@ export type Round = {
  * @param difficulty - Chosen difficulty level (1–100)
  * @returns Array of 20 word strings
  */
-export function selectWords(groups: WordList[], difficulty: number): string[] {
+export function selectWords(groups: WordGroups, difficulty: number): string[] {
   const levelIndex = Math.max(0, Math.min(groups.length - 1, difficulty - 1));
   const belowIndex = Math.max(0, levelIndex - 1);
   const aboveIndex = Math.min(groups.length - 1, levelIndex + 1);
 
   const used = new Set<string>();
 
-  const pick = (group: WordList, count: number): string[] => {
-    const available = group.filter((e) => !used.has(e.word));
+  const pick = (group: string[], count: number): string[] => {
+    const available = group.filter((word) => !used.has(word));
     const shuffled = [...available].sort(() => Math.random() - 0.5);
-    const picked = shuffled.slice(0, count).map((entry) => entry.word);
+    const picked = shuffled.slice(0, count);
     for (const word of picked) used.add(word);
     return picked;
   };

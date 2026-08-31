@@ -172,13 +172,13 @@ export function scoreWords(source: WordList): WordList {
   return scored;
 }
 
-// Group words by difficulty level
-export type WordGroups = Array<WordList>;
+// Group words by difficulty level. Only the sorted words are kept.
+export type WordGroups = Array<Array<string>>;
 export function wordGroups(source: WordList): WordGroups {
   const WORDS_PER_LEVEL = 20;
   const groups: WordGroups = [];
   for (let i = 0; i < source.length; i += WORDS_PER_LEVEL) {
-    groups.push(source.slice(i, i + WORDS_PER_LEVEL));
+    groups.push(source.slice(i, i + WORDS_PER_LEVEL).map((entry) => entry.word));
   }
   return groups;
 }

@@ -425,11 +425,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const groups = JSON.parse(await Deno.readTextFile(WORDS_PATH)) as Array<
-    Array<{ word: string }>
-  >;
+  const groups = JSON.parse(await Deno.readTextFile(WORDS_PATH)) as string[][];
   const allWords = [
-    ...new Set(groups.flat().map((entry) => String(entry.word))),
+    ...new Set(groups.flat().map(String)),
   ].filter((w) => w.length > 0);
   const targets = Number.isFinite(limit) ? allWords.slice(0, limit) : allWords;
   const total = targets.length;
