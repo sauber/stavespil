@@ -77,7 +77,7 @@ Deno.test("checkTrophies returns pa_vej_op when isRankUp is true", () => {
   assertEquals(result[0].id, "pa_vej_op");
 });
 
-Deno.test("checkTrophies returns bbjergbestiger for rank >= 10", () => {
+Deno.test("checkTrophies returns bjergbestiger for rank >= 10", () => {
   const result = checkTrophies(
     makeResult(),
     makeStats({ currentRank: 10 }),

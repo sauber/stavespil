@@ -355,9 +355,9 @@ function completeRound(): void {
   const result = round.getResult();
   const profile = loadProfile();
   const stats = buildPlayerStats(profile);
-  const earnedIds = getEarnedTrophyIds(profile);
-  const trophies = checkTrophies(result, stats, earnedIds);
   const newRank = calculateNewRank(stats.currentRank, result.difficulty, result.rankChange);
+  const earnedIds = getEarnedTrophyIds(profile);
+  const trophies = checkTrophies(result, { ...stats, currentRank: newRank }, earnedIds);
 
   profile.roundHistory.push({
     difficulty: result.difficulty,
