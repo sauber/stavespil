@@ -35,6 +35,88 @@ const difficulty = Math.max(
 );
 
 /**
+ * Synthesize subtle audible key feedback via the Web Audio API.
+ *
+ * Correct letters rise through the C-major scale (H = B) and resolve to a
+ * C–E chord on the final letter of a word; wrong letters play a short click.
+ * The AudioContext is created lazily on the first key press (a user gesture,
+ * satisfying the browser autoplay policy) and falls back to silence if Web
+ * Audio is unavailable.
+ */
+function createKeyFeedback(): {
+  correct(letter: number, wordLength: number): void;
+  wrong(): void;
+} {
+  let audioCtx: AudioContext | null = null;
+  const SCALE = [0, 2, 4, 5, 7, 9, 11];
+
+  function getContext(): AudioContext | null {
+    const Ctor = globalThis.AudioContext;
+    if (!Ctor) return null;
+    if (!audioCtx) audioCtx = new Ctor();
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+    return audioCtx;
+  }
+
+  function tone(freq: number, duration: number, volume: number): void {
+    const ctx = getContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  /** Frequency of a scale degree counted from C4 (degrees 1..7 = C D E F G A H). */
+  function degreeFreq(degree: number): number {
+    const idx = degree - 1;
+    const octave = Math.floor(idx / 7);
+    const step = SCALE[((idx % 7) + 7) % 7];
+    return 261.63 * Math.pow(2, (octave * 12 + step) / 12);
+  }
+
+  return {
+    correct(letter, wordLength) {
+      if (letter === wordLength) {
+        tone(degreeFreq(8), 0.7, 0.09);
+        tone(degreeFreq(10), 0.7, 0.07);
+        return;
+      }
+      const degree = 9 - wordLength + (letter - 1);
+      tone(degreeFreq(degree), 0.35, 0.12);
+    },
+    wrong() {
+      const ctx = getContext();
+      if (!ctx) return;
+      const frameSize = Math.floor(ctx.sampleRate * 0.04);
+      const buffer = ctx.createBuffer(1, frameSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < frameSize; i++) data[i] = Math.random() * 2 - 1;
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = 1200;
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(now);
+    },
+  };
+}
+
+/**
  * Create and run the round UI for the current difficulty.
  *
  * All per-round state is captured in this closure so a single running round
@@ -54,6 +136,8 @@ function createRoundController(): void {
   let audioEl: HTMLAudioElement;
   let completed = false;
   let frameErrorSeen = 0;
+  let prevFilledCount = 0;
+  const feedback = createKeyFeedback();
   let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
 
   function flashKey(letter: string): HTMLElement | null {
@@ -256,18 +340,26 @@ function createRoundController(): void {
   }
 
   function handleState(state: EngineState): void {
+    const filledCount = state.frames.filter((f) => f !== null).length;
     if (state.wordIndex !== lastWordIndex) {
       lastWordIndex = state.wordIndex;
       clearPressedKeys();
       prevWordErrors = 0;
       frameErrorSeen = 0;
+      prevFilledCount = 0;
       activeLetters = new Set(DANISH_LETTERS);
       updateImage(state.image);
       updateSound(state.sound);
       playSound();
     } else {
+      if (state.wordErrors > prevWordErrors) {
+        feedback.wrong();
+      } else if (filledCount > prevFilledCount) {
+        feedback.correct(filledCount, state.word.length);
+      }
       handleDimming(state);
     }
+    prevFilledCount = filledCount;
 
     renderHeader(state);
     renderFrames(state);

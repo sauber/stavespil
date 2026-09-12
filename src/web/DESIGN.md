@@ -127,6 +127,16 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 - Correct letters fill frames in sequence with a "fall into place" animation.
 - Wrong letters trigger a subtle shake animation.
 
+### Audible Key Feedback
+
+- Each correct letter plays a quiet triangle-wave note; the letters of a word
+  rise through the C-major scale (H = B), and the final letter completes the
+  word with a C–E chord.
+- Each wrong letter plays a short, low-volume click.
+- Tones are synthesized on the fly with the Web Audio API — no assets, fully
+  offline. They let children who look at the keyboard instead of the screen
+  hear immediately whether a letter was accepted.
+
 ### Flow
 
 1. One word is presented at a time.
