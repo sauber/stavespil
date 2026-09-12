@@ -304,13 +304,24 @@ function createRoundController(): void {
     setTimeout(() => container.remove(), 3000);
   }
 
+  function rankChangeMessage(levelChange: number, newRank: number): string {
+    if (levelChange > 0) {
+      return `Tillykke! Du er nået til niveau ${newRank}.`;
+    }
+    if (levelChange < 0) {
+      return `Godt forsøgt. Dit niveau er nu ${newRank}. Prøv et lettere niveau næste gang.`;
+    }
+    return `Flot spillet! Du er stadig på niveau ${newRank}. Prøv igen for at komme videre.`;
+  }
+
   function renderResult(
     result: RoundResult,
     newRank: number,
+    levelChange: number,
     trophies: Trophy[],
   ): void {
     const rankSymbol =
-      result.rankChange === 1 ? "▲" : result.rankChange === -1 ? "▼" : "—";
+      levelChange > 0 ? "▲" : levelChange < 0 ? "▼" : "—";
     const trophiesHtml = trophies.length
       ? `
         <div class="new-trophies">
@@ -333,13 +344,17 @@ function createRoundController(): void {
         <h2>Bane færdig!</h2>
         <div class="result-score">${Math.round(result.score)}</div>
         <div class="result-label">score</div>
+        <div class="result-message">${rankChangeMessage(levelChange, newRank)}</div>
         <div class="result-stats">
           <span class="stat-badge">Fejl: ${result.errors}</span>
           <span class="stat-badge">Tid: ${Math.round(result.totalTime)}s</span>
           <span class="stat-badge">${rankSymbol} Niveau ${newRank}</span>
         </div>
         ${trophiesHtml}
-        <a class="menu-button" href="/">Til forsiden</a>
+        <div class="result-actions">
+          <a class="menu-button" href="/">Til forsiden</a>
+          <a class="menu-button" href="/round/${newRank}">Spil niveau ${newRank}</a>
+        </div>
       </div>
     `;
 
@@ -360,11 +375,13 @@ function createRoundController(): void {
     const result = round.getResult();
     const profile = loadProfile();
     const stats = buildPlayerStats(profile);
+    const prevRank = stats.currentRank;
     const newRank = calculateNewRank(
-      stats.currentRank,
+      prevRank,
       result.difficulty,
       result.rankChange,
     );
+    const levelChange = newRank - prevRank;
     const earnedIds = getEarnedTrophyIds(profile);
     const trophies = checkTrophies(
       result,
@@ -383,7 +400,7 @@ function createRoundController(): void {
     });
     saveProfile(profile);
 
-    renderResult(result, newRank, trophies);
+    renderResult(result, newRank, levelChange, trophies);
   }
 
   async function startRound(): Promise<void> {
