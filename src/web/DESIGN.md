@@ -94,13 +94,16 @@ The web module should import from `src/gameState/mod.ts` directly.
 
 ## Visual Design
 
-Minimalist, child-friendly style for ages 3–6 (grades 3–6).
+Minimalist, child-friendly style for grades 3–6 (ages 8–12).
 
 - **Colors**: Light blue `#B8DEFF`, light green `#B8F0C8`, warm white `#FAFAF7`,
-  soft pink accents `#FFD6E0`. No dark backgrounds.
-- **Typography**: Clear sans-serif, large font sizes.
-- **Shapes**: Large, rounded forms throughout.
-- **Layout**: Responsive — primarily tablet, but functional on desktop.
+  soft pink `#FFD6E0`. Extended palette: sunny yellow `#FFE28A`, lavender
+  `#D6C9FF`, peach `#FFC9A8`, mint `#A8E6CF`. No dark backgrounds.
+- **Typography**: **Nunito** (rounded body text), **Fredoka** (playful headings),
+  system-ui fallback for offline. Large font sizes throughout.
+- **Shapes**: Large, rounded forms throughout; 1rem+ border-radius on cards.
+- **Layout**: Responsive — 720px max-width menu, wider tablet primary,
+  functional on mobile.
 
 ## Game Screen
 
@@ -148,18 +151,23 @@ Minimalist, child-friendly style for ages 3–6 (grades 3–6).
 
 ### Rank Display
 
-- Current (most recent) rank shown prominently.
+- Current (most recent) rank shown prominently as a colorful badge whose color
+  and emoji change per rank tier (e.g. 🌱 1–9, ⭐ 10–24, 👑 100).
 - Line chart of rank history over time (hand-drawn SVG).
+- Friendly call-to-action button to play the current level.
 
 ### Level Selection
 
 - Scrollable list of all 100 difficulty levels.
-- Each level shows an example word.
+- Each level shows an example word on a pastel-colored bubble.
+- The current level is highlighted with a "Du er her" star tag; played levels
+  show a small checkmark.
 - Player taps a level to start the round.
 
 ### Trophy Collection
 
-- Grid of trophy cards displayed below the level list.
+- Grid of trophy cards displayed below the level list, with an earned counter
+  chip (e.g. "4 af 15").
 - Unlocked trophies: full color emoji + title + date earned.
 - Locked trophies: grayscale with a lock icon, hidden title.
 

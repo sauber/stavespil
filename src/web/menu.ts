@@ -6,10 +6,43 @@ import {
   getEarnedTrophyIds,
   loadProfile,
 } from "../player/mod.ts";
+import type { PlayerProfile } from "../player/mod.ts";
 import { clear as clearCache } from "../cache/cache.ts";
 import { getAllTrophies } from "../reward/mod.ts";
 import { loadWords } from "../words/load.ts";
 import type { WordGroups } from "../words/generate.ts";
+
+/** Rank tiers give progress a friendly color and emoji. */
+const RANK_TIERS: Array<{ max: number; emoji: string; css: string }> = [
+  { max: 9, emoji: "🌱", css: "tier-starter" },
+  { max: 24, emoji: "⭐", css: "tier-explorer" },
+  { max: 49, emoji: "💫", css: "tier-skipper" },
+  { max: 74, emoji: "🤩", css: "tier-star" },
+  { max: 99, emoji: "🦄", css: "tier-unicorn" },
+  { max: 100, emoji: "👑", css: "tier-king" },
+];
+
+/** Pastel colors cycling per 10-level zone. */
+const ZONE_COLORS = [
+  "#B8DEFF",
+  "#B8F0C8",
+  "#FFD6E0",
+  "#FFE28A",
+  "#D6C9FF",
+  "#FFC9A8",
+  "#A8E6CF",
+  "#FFD3A5",
+  "#C4E0F9",
+  "#F9C6D7",
+];
+
+function rankTier(rank: number): { emoji: string; css: string } {
+  return RANK_TIERS.find((t) => rank <= t.max) ?? RANK_TIERS[0];
+}
+
+function zoneColor(level: number): string {
+  return ZONE_COLORS[(level - 1) % ZONE_COLORS.length];
+}
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString("da-DK", {
@@ -19,27 +52,41 @@ function formatDate(ts: number): string {
   });
 }
 
-function renderProgression(
-  profile: ReturnType<typeof loadProfile>,
-): HTMLElement {
+function makePlayButton(level: number): HTMLElement {
+  const btn = document.createElement("a");
+  btn.className = "level-button cta";
+  btn.setAttribute("href", `/round/${level}`);
+  btn.textContent = `▶️ Spil niveau ${level}`;
+  return btn;
+}
+
+function renderProgression(profile: PlayerProfile): HTMLElement {
   const section = document.createElement("section");
+  section.className = "progress-section";
   const stats = buildPlayerStats(profile);
 
   if (profile.roundHistory.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty-message";
-    empty.textContent =
-      "Ingen spillede baner endnu. Vælg et niveau for at komme i gang!";
+    const empty = document.createElement("div");
+    empty.className = "empty-state";
+    empty.innerHTML = `
+      <span class="empty-emoji">🧸</span>
+      <p class="empty-message">Velkommen! Vælg et niveau nedenfor, og lad os
+        stave sammen.</p>
+    `;
     section.appendChild(empty);
-
-    const levelBtn = document.createElement("a");
-    levelBtn.className = "level-button";
-    levelBtn.setAttribute("href", "/round/1");
-    levelBtn.textContent = "Spil niveau 1";
-    section.appendChild(levelBtn);
-
+    section.appendChild(makePlayButton(1));
     return section;
   }
+
+  const tier = rankTier(stats.currentRank);
+  const badge = document.createElement("div");
+  badge.className = `rank-badge ${tier.css}`;
+  badge.innerHTML = `
+    <span class="rank-emoji">${tier.emoji}</span>
+    <span class="rank-label">Dit niveau</span>
+    <span class="rank-value">${stats.currentRank}</span>
+  `;
+  section.appendChild(badge);
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 560 200");
@@ -82,7 +129,7 @@ function renderProgression(
     line.setAttribute("x2", String(padL + w));
     line.setAttribute("y1", String(yy));
     line.setAttribute("y2", String(yy));
-    line.setAttribute("stroke", "#e0e0e0");
+    line.setAttribute("stroke", "#e8e8f0");
     line.setAttribute("stroke-width", "1");
     svg.appendChild(line);
 
@@ -156,8 +203,9 @@ function renderProgression(
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d);
   path.setAttribute("fill", "none");
-  path.setAttribute("stroke", "#8BC6F5");
-  path.setAttribute("stroke-width", "2.5");
+  path.setAttribute("stroke", "#5BA8DE");
+  path.setAttribute("stroke-width", "3.5");
+  path.setAttribute("stroke-linecap", "round");
   path.setAttribute("stroke-linejoin", "round");
   svg.appendChild(path);
 
@@ -169,8 +217,10 @@ function renderProgression(
     );
     circle.setAttribute("cx", String(x(e.timestamp)));
     circle.setAttribute("cy", String(y(e.newRank)));
-    circle.setAttribute("r", "3.5");
-    circle.setAttribute("fill", "#5BA8DE");
+    circle.setAttribute("r", "5");
+    circle.setAttribute("fill", "#FFB3C6");
+    circle.setAttribute("stroke", "#fff");
+    circle.setAttribute("stroke-width", "2");
     svg.appendChild(circle);
   }
 
@@ -182,27 +232,30 @@ function renderProgression(
   const statsRow = document.createElement("div");
   statsRow.className = "stats-row";
   statsRow.innerHTML = `
-    <span class="stat-badge">Baner: ${stats.totalRounds}</span>
+    <span class="stat-badge">🕹️ Baner: ${stats.totalRounds}</span>
+    <span class="stat-badge">🏅 Niveau: ${stats.currentRank}</span>
   `;
   section.appendChild(statsRow);
 
-  const levelBtn = document.createElement("a");
-  levelBtn.className = "level-button";
-  levelBtn.setAttribute("href", `/round/${stats.currentRank}`);
-  levelBtn.textContent = `Spil niveau ${stats.currentRank}`;
-  section.appendChild(levelBtn);
+  section.appendChild(makePlayButton(stats.currentRank));
 
   return section;
 }
 
-function renderTrophies(profile: ReturnType<typeof loadProfile>): HTMLElement {
+function renderTrophies(profile: PlayerProfile): HTMLElement {
   const section = document.createElement("section");
+  section.className = "trophies-section";
   const heading = document.createElement("h2");
-  heading.textContent = "Trofæer";
+  heading.textContent = "🏆 Trofæer";
   section.appendChild(heading);
 
   const allTrophies = getAllTrophies();
   const earnedIds = new Set(getEarnedTrophyIds(profile));
+
+  const chip = document.createElement("span");
+  chip.className = "trophy-count";
+  chip.textContent = `${earnedIds.size} af ${allTrophies.length}`;
+  heading.appendChild(chip);
 
   const earnedDates = new Map<string, number>();
   for (const entry of profile.roundHistory) {
@@ -238,19 +291,31 @@ function renderTrophies(profile: ReturnType<typeof loadProfile>): HTMLElement {
   return section;
 }
 
-function renderLevelSelection(groups: WordGroups): HTMLElement {
+function renderLevelSelection(
+  groups: WordGroups,
+  profile: PlayerProfile,
+): HTMLElement {
   const section = document.createElement("section");
   const heading = document.createElement("h2");
-  heading.textContent = "Vælg niveau";
+  heading.textContent = "🎯 Vælg niveau";
   section.appendChild(heading);
+
+  const stats = buildPlayerStats(profile);
+  const played = new Set(profile.roundHistory.map((e) => e.difficulty));
 
   const list = document.createElement("div");
   list.className = "level-list";
 
   for (let level = 0; level < 100; level++) {
+    const num = level + 1;
     const item = document.createElement("a");
     item.className = "level-item";
-    item.setAttribute("href", `/round/${level + 1}`);
+    item.setAttribute("href", `/round/${num}`);
+    if (num === stats.currentRank) {
+      item.classList.add("current");
+    } else if (played.has(num)) {
+      item.classList.add("played");
+    }
 
     const words = groups[level]
       ? [...groups[level]]
@@ -260,11 +325,12 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
       : "...";
 
     item.innerHTML = `
-      <span class="level-number">${level + 1}.</span>
+      <span class="level-bubble" style="background:${zoneColor(num)}">${num}</span>
       <span class="level-words">${words}</span>
+      ${num === stats.currentRank ? `<span class="current-tag">⭐ Du er her</span>` : ""}
     `;
     item.addEventListener("click", () => {
-      location.href = `/round/${level + 1}`;
+      location.href = `/round/${num}`;
     });
     list.appendChild(item);
   }
@@ -276,7 +342,7 @@ function renderLevelSelection(groups: WordGroups): HTMLElement {
 function renderResetButton(): HTMLElement {
   const btn = document.createElement("button");
   btn.className = "reset-button";
-  btn.textContent = "Nulstil spil";
+  btn.textContent = "🧹 Nulstil spil";
   btn.addEventListener("click", () => {
     const ok = globalThis.confirm(
       "Dette sletter al din fremgang, alle trofæer og alle downloadede billeder. Kan ikke fortrydes. Fortsæt?",
@@ -299,7 +365,7 @@ async function render(): Promise<void> {
   const app = document.createElement("main");
   app.appendChild(renderProgression(profile));
   app.appendChild(renderTrophies(profile));
-  app.appendChild(renderLevelSelection(groups));
+  app.appendChild(renderLevelSelection(groups, profile));
   app.appendChild(renderResetButton());
 
   document.body.appendChild(app);

@@ -1,4 +1,4 @@
 TODO list
 
 - Remove duplication in .env file
-- More kids friendly and engaging interface
+- Make the round screen more kids friendly (menu screen done)
