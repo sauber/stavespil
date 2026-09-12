@@ -85,8 +85,8 @@ export function calculateCombinedScore(
  * @returns +1 (rank up), 0 (unchanged), or -1 (rank down)
  */
 export function calculateRankChange(score: number): -1 | 0 | 1 {
-  if (score >= 75) return 1;
-  if (score >= 40) return 0;
+  if (score >= 85) return 1;
+  if (score >= 70) return 0;
   return -1;
 }
 

@@ -96,20 +96,20 @@ Deno.test("calculateCombinedScore weights error 60% and time 40%", () => {
   assertEquals(calculateCombinedScore(0, 100), 40);
 });
 
-Deno.test("calculateRankChange returns +1 for score >= 75", () => {
-  assertEquals(calculateRankChange(75), 1);
+Deno.test("calculateRankChange returns +1 for score >= 85", () => {
+  assertEquals(calculateRankChange(85), 1);
   assertEquals(calculateRankChange(100), 1);
 });
 
-Deno.test("calculateRankChange returns 0 for score 40–74", () => {
-  assertEquals(calculateRankChange(40), 0);
-  assertEquals(calculateRankChange(57), 0);
-  assertEquals(calculateRankChange(74), 0);
+Deno.test("calculateRankChange returns 0 for score 70–84", () => {
+  assertEquals(calculateRankChange(70), 0);
+  assertEquals(calculateRankChange(77), 0);
+  assertEquals(calculateRankChange(84), 0);
 });
 
-Deno.test("calculateRankChange returns -1 for score < 40", () => {
+Deno.test("calculateRankChange returns -1 for score < 70", () => {
   assertEquals(calculateRankChange(0), -1);
-  assertEquals(calculateRankChange(39), -1);
+  assertEquals(calculateRankChange(69), -1);
 });
 
 Deno.test("calculateTotalTime sums word durations", () => {

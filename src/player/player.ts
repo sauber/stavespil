@@ -31,8 +31,7 @@ const STORAGE_KEY = "roundHistory";
  * Rules (S = current rank, B = difficulty, R = result):
  *   T = S - 1  when S == B and R == -1
  *   T = S - 1  when B < S  and R <= 0
- *   T = S + 1  when S == B and R == +1
- *   T = S + 1  when B > S  and R >= 0
+ *   T = S + 1  when B >= S and R == +1
  *   T = S      in all other cases
  *
  * @param currentRank - The player's current rank (1–100)
@@ -51,9 +50,7 @@ export function calculateNewRank(
     newRank = currentRank - 1;
   } else if (difficulty < currentRank && result <= 0) {
     newRank = currentRank - 1;
-  } else if (currentRank === difficulty && result === 1) {
-    newRank = currentRank + 1;
-  } else if (difficulty > currentRank && result >= 0) {
+  } else if (difficulty >= currentRank && result === 1) {
     newRank = currentRank + 1;
   } else {
     newRank = currentRank;

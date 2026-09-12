@@ -55,8 +55,7 @@ Rules:
 
 - T = S - 1 when S == B and R == -1
 - T = S - 1 when B < S and R <= 0
-- T = S + 1 when S == B and R == +1
-- T = S + 1 when B > S and R >= 0
+- T = S + 1 when B >= S and R == +1
 - T = S in all other cases
 
 ### Interfaces

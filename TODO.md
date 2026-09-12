@@ -5,3 +5,5 @@ TODO list
 - When failing a round then player level cannot improve
 - After completing spelling a word, repeat audio before proceeding to next word.
 - Right and wrong tone for keypresses
+- Reveal how to unlock trophies
+- Misspelling "Ny trofæ!" -> "Nyt trofæ!"

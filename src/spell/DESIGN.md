@@ -112,9 +112,9 @@ combined = (errorScore × 0.6) + (timeScore × 0.4)
 
 | Score  | Change |
 |--------|--------|
-| ≥ 75   | +1     |
-| 40–74  | 0      |
-| < 40   | −1     |
+| ≥ 85   | +1     |
+| 70–84  | 0      |
+| < 70   | −1     |
 
 ### R10 — State Communication
 
@@ -327,7 +327,7 @@ function computeScore(wordResults: WordResult[], difficulty: number): ScoreResul
 - Error score: 0, 1, 2, 3, 4+ errors, interpolation between breakpoints
 - Time score: fast/slow words, difficulty multiplier, edge cases
 - Combined score: weighted average verification
-- Rank change: boundary values (39, 40, 74, 75)
+- Rank change: boundary values (69, 70, 84, 85)
 - Total time: sum calculation
 
 **`engine.test.ts`**: State machine tests with mocked dependencies.

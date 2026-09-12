@@ -60,8 +60,8 @@ Deno.test("calculateNewRank ranks up when difficulty > rank and result == +1", (
   assertEquals(calculateNewRank(5, 8, 1), 6);
 });
 
-Deno.test("calculateNewRank ranks up when difficulty > rank and result == 0", () => {
-  assertEquals(calculateNewRank(5, 8, 0), 6);
+Deno.test("calculateNewRank stays same when difficulty > rank and result == 0", () => {
+  assertEquals(calculateNewRank(5, 8, 0), 5);
 });
 
 Deno.test("calculateNewRank stays same when difficulty > rank and result == -1", () => {
