@@ -227,8 +227,8 @@ function renderTrophies(profile: ReturnType<typeof loadProfile>): HTMLElement {
 
     card.innerHTML = `
       <span class="emoji">${trophy.emoji}</span>
-      <div class="title">${isEarned ? trophy.title : "???"}</div>
-      <div class="desc">${isEarned ? trophy.description : ""}</div>
+      <div class="title">${trophy.title}</div>
+      <div class="desc">${trophy.description}</div>
       ${dateStr ? `<div class="date">${dateStr}</div>` : ""}
     `;
     grid.appendChild(card);

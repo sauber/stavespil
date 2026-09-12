@@ -86,8 +86,8 @@ h2 {
   color: #aaa;
   margin-top: 0.3rem;
 }
-.trophy-card.locked .title::after {
-  content: " \1F512";
+.trophy-card.locked .desc::before {
+  content: "\1F512 ";
 }
 .level-list {
   display: flex;

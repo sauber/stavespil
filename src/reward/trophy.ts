@@ -12,19 +12,49 @@ export type Trophy = {
   description: string;
 };
 
-const TROPHY_DEFINITIONS: Array<Trophy & {
-  condition: (
-    result: RoundResult,
-    stats: PlayerStats,
-    earned: string[],
-  ) => boolean;
-}> = [
+const TROPHY_DEFINITIONS: Array<
+  Trophy & {
+    condition: (
+      result: RoundResult,
+      stats: PlayerStats,
+      earned: string[],
+    ) => boolean;
+  }
+> = [
   {
     id: "forste_bane",
     title: "Første bane",
     emoji: "🌟",
     description: "Fuldfør din allerførste bane",
     condition: (_r, _s, earned) => !earned.includes("forste_bane"),
+  },
+  {
+    id: "pa_vej_op",
+    title: "På vej op",
+    emoji: "📈",
+    description: "Ryk op i niveau for første gang",
+    condition: (r) => r.isRankUp,
+  },
+  {
+    id: "flittig",
+    title: "Flittig",
+    emoji: "📚",
+    description: "Fuldfør 5 baner i alt",
+    condition: (_r, s) => s.totalRounds >= 5,
+  },
+  {
+    id: "regnbue",
+    title: "Regnbue",
+    emoji: "🌈",
+    description: "Fuldfør baner på 5 forskellige niveauer",
+    condition: (_r, s) => s.distinctDifficulties.length >= 5,
+  },
+  {
+    id: "pa_rekke",
+    title: "På række",
+    emoji: "🔥",
+    description: "Stav 10 ord i træk uden fejl (inden for én bane)",
+    condition: (r) => r.maxStreak >= 10,
   },
   {
     id: "stavemester",
@@ -48,25 +78,11 @@ const TROPHY_DEFINITIONS: Array<Trophy & {
     condition: (r) => r.errors === 0,
   },
   {
-    id: "pa_rekke",
-    title: "På række",
-    emoji: "🔥",
-    description: "Stav 10 ord i træk uden fejl (inden for én bane)",
-    condition: (r) => r.maxStreak >= 10,
-  },
-  {
-    id: "flittig",
-    title: "Flittig",
-    emoji: "📚",
-    description: "Fuldfør 5 baner i alt",
-    condition: (_r, s) => s.totalRounds >= 5,
-  },
-  {
-    id: "pa_vej_op",
-    title: "På vej op",
-    emoji: "📈",
-    description: "Ryk op i niveau for første gang",
-    condition: (r) => r.isRankUp,
+    id: "maraton",
+    title: "Maraton",
+    emoji: "🏅",
+    description: "Fuldfør 25 baner i alt",
+    condition: (_r, s) => s.totalRounds >= 25,
   },
   {
     id: "bjergbestiger",
@@ -83,11 +99,11 @@ const TROPHY_DEFINITIONS: Array<Trophy & {
     condition: (r) => r.totalTime < 180,
   },
   {
-    id: "regnbue",
-    title: "Regnbue",
-    emoji: "🌈",
-    description: "Fuldfør baner på 5 forskellige niveauer",
-    condition: (_r, s) => s.distinctDifficulties.length >= 5,
+    id: "svup",
+    title: "Svup",
+    emoji: "💨",
+    description: "Fuldfør en bane på under 2 minutter",
+    condition: (r) => r.totalTime < 120,
   },
   {
     id: "natteravn",
@@ -102,6 +118,13 @@ const TROPHY_DEFINITIONS: Array<Trophy & {
     emoji: "👑",
     description: "Nå niveau 50",
     condition: (_r, s) => s.currentRank >= 50,
+  },
+  {
+    id: "universet",
+    title: "Universet",
+    emoji: "🌌",
+    description: "Nå niveau 100",
+    condition: (_r, s) => s.currentRank >= 100,
   },
 ];
 

@@ -67,6 +67,16 @@ Deno.test("checkTrophies returns flittig for totalRounds >= 5", () => {
   assertEquals(result[0].id, "flittig");
 });
 
+Deno.test("checkTrophies returns maraton for totalRounds >= 25", () => {
+  const result = checkTrophies(
+    makeResult(),
+    makeStats({ totalRounds: 25 }),
+    ["forste_bane", "flittig"],
+  );
+  assertEquals(result.length, 1);
+  assertEquals(result[0].id, "maraton");
+});
+
 Deno.test("checkTrophies returns pa_vej_op when isRankUp is true", () => {
   const result = checkTrophies(
     makeResult({ isRankUp: true }),
@@ -97,6 +107,16 @@ Deno.test("checkTrophies returns ekspres for totalTime < 180", () => {
   assertEquals(result[0].id, "ekspres");
 });
 
+Deno.test("checkTrophies returns svup for totalTime < 120", () => {
+  const result = checkTrophies(
+    makeResult({ totalTime: 100 }),
+    makeStats(),
+    ["forste_bane", "ekspres"],
+  );
+  assertEquals(result.length, 1);
+  assertEquals(result[0].id, "svup");
+});
+
 Deno.test("checkTrophies returns regnbue for 5+ distinct difficulties", () => {
   const result = checkTrophies(
     makeResult(),
@@ -125,6 +145,16 @@ Deno.test("checkTrophies returns kongen_af_ord for rank >= 50", () => {
   );
   assertEquals(result.length, 1);
   assertEquals(result[0].id, "kongen_af_ord");
+});
+
+Deno.test("checkTrophies returns universet for rank >= 100", () => {
+  const result = checkTrophies(
+    makeResult(),
+    makeStats({ currentRank: 100 }),
+    ["forste_bane", "bjergbestiger", "natteravn", "kongen_af_ord"],
+  );
+  assertEquals(result.length, 1);
+  assertEquals(result[0].id, "universet");
 });
 
 Deno.test("checkTrophies returns at most 1 trophy per round", () => {

@@ -325,7 +325,7 @@ function createRoundController(): void {
     const trophiesHtml = trophies.length
       ? `
         <div class="new-trophies">
-          <h3>Ny trofæ${trophies.length > 1 ? "er" : ""}!</h3>
+          <h3>Nyt trofæ!</h3>
           <div class="trophy-grid">
             ${trophies.map((t) => `
               <div class="trophy-card">
