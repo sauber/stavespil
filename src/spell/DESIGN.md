@@ -85,15 +85,19 @@ The score is computed from error rate and time, weighted 60/40.
 
 **Error score (0–100):**
 
+Linear curve — the first error is free, each additional error subtracts 1 point
+(floored at 0):
+
 | Errors | Score |
 |--------|-------|
-| 0      | 100   |
-| 1      | 80    |
-| 2      | 60    |
-| 3      | 40    |
-| ≥4     | 20    |
+| 0–1    | 100   |
+| 2      | 99    |
+| 3      | 98    |
+| 4      | 97    |
+| 7      | 94    |
+| ≥101   | 0     |
 
-Linear interpolation between breakpoints.
+Continuous for fractional error counts.
 
 **Time score (0–100):**
 

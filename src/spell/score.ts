@@ -3,15 +3,17 @@ import type { WordResult, ScoreResult } from "./types.ts";
 /**
  * Calculate error rate score from total errors across 20 words.
  *
- * Scoring: 0 errors → 100, 1 → 80, 2 → 60, 3 → 40, ≥4 → 20.
+ * Scoring is linear: the first error is free, then each additional error
+ * subtracts 1 point.
+ *
+ * Scoring: 0–1 errors → 100, 2 → 99, 3 → 98, …, floored at 0.
  *
  * @param totalErrors - Sum of wrong letters across all words
  * @returns Error score (0–100)
  */
 export function calculateErrorScore(totalErrors: number): number {
-  if (totalErrors <= 0) return 100;
-  if (totalErrors >= 4) return 20;
-  return 100 - totalErrors * 20;
+  if (totalErrors <= 1) return 100;
+  return Math.max(0, 100 - (totalErrors - 1));
 }
 
 /**

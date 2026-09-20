@@ -24,28 +24,20 @@ Deno.test("calculateErrorScore returns 100 for 0 errors", () => {
   assertEquals(calculateErrorScore(0), 100);
 });
 
-Deno.test("calculateErrorScore returns 80 for 1 error", () => {
-  assertEquals(calculateErrorScore(1), 80);
+Deno.test("calculateErrorScore returns 100 for 1 error", () => {
+  assertEquals(calculateErrorScore(1), 100);
 });
 
-Deno.test("calculateErrorScore returns 60 for 2 errors", () => {
-  assertEquals(calculateErrorScore(2), 60);
+Deno.test("calculateErrorScore subtracts 1 per error after the first", () => {
+  assertEquals(calculateErrorScore(2), 99);
+  assertEquals(calculateErrorScore(3), 98);
+  assertEquals(calculateErrorScore(7), 94);
+  assertEquals(calculateErrorScore(50), 51);
 });
 
-Deno.test("calculateErrorScore returns 40 for 3 errors", () => {
-  assertEquals(calculateErrorScore(3), 40);
-});
-
-Deno.test("calculateErrorScore returns 20 for 4+ errors", () => {
-  assertEquals(calculateErrorScore(4), 20);
-  assertEquals(calculateErrorScore(10), 20);
-});
-
-Deno.test("calculateErrorScore interpolates between breakpoints", () => {
-  assertEquals(calculateErrorScore(0.5), 90);
-  assertEquals(calculateErrorScore(1.5), 70);
-  assertEquals(calculateErrorScore(2.5), 50);
-  assertEquals(calculateErrorScore(3.5), 30);
+Deno.test("calculateErrorScore floors at 0", () => {
+  assertEquals(calculateErrorScore(101), 0);
+  assertEquals(calculateErrorScore(200), 0);
 });
 
 Deno.test("calculateErrorScore clamps negative to 100", () => {
@@ -163,4 +155,27 @@ Deno.test("computeScore returns complete ScoreResult", () => {
   assertEquals(typeof result.combinedScore, "number");
   assertEquals(typeof result.rankChange, "number");
   assertEquals(typeof result.totalTime, "number");
+});
+
+Deno.test("computeScore yields ~95 points with 7 errors and fast time", () => {
+  const results = Array.from({ length: 20 }, () =>
+    makeWordResult({ word: "test", startTime: 0, endTime: 2000 })
+  );
+  for (let i = 0; i < 7; i++) results[i].errors = 1;
+  const result = computeScore(results, 1);
+  assertEquals(result.errorScore, 94);
+  assertEquals(result.timeScore, 100);
+  assertEquals(result.combinedScore >= 95, true);
+  assertEquals(result.rankChange, 1);
+});
+
+Deno.test("computeScore yields 100 points with 1 error and fast time", () => {
+  const results = Array.from({ length: 20 }, () =>
+    makeWordResult({ word: "test", startTime: 0, endTime: 2000 })
+  );
+  results[0].errors = 1;
+  const result = computeScore(results, 1);
+  assertEquals(result.errorScore, 100);
+  assertEquals(result.timeScore, 100);
+  assertEquals(result.combinedScore, 100);
 });
